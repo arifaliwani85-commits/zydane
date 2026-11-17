@@ -1,0 +1,34 @@
+{
+  "name": "zydane",
+  "version": "0.1.0",
+  "description": "Zydane — premium storefront for private-label and curated dropship products",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arifaliwani85-commits/zydane.git"
+  },
+  "bugs": {
+    "url": "https://github.com/arifaliwani85-commits/zydane/issues"
+  },
+  "homepage": "https://github.com/arifaliwani85-commits/zydane#readme",
+  "dependencies": {
+    "@fontsource/instrument-serif": "^5.3.0",
+    "geist": "^1.9.2",
+    "next": "^16.4.6",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^5.9.3"
+  },
+  "private": true
+}
