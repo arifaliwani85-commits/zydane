@@ -50,3 +50,9 @@ STRIPE_SECRET_KEY=sk_live_...
 ## Before launch
 
 The catalogue, reviews, ratings and customer statistics are **sample content**. Replace them with your real products and genuine reviews before going live.
+
+## Hosting
+
+The store is deployed to Hostinger at **https://shop.zydane.com** and redeploys automatically on every push to the deployed branch.
+
+The build uses webpack (`next build --webpack`) and a JavaScript config file, because Hostinger's build servers have an older system library (glibc) than Next.js's default compiler needs. Keep both when changing the build setup.
