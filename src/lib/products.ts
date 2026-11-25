@@ -50,6 +50,10 @@ export interface Product {
   highlights?: { title: string; text: string }[];
   safety?: string;
   featured?: boolean;
+  /** WooCommerce product id, for Curated Finds synced from the AliDropship back office. */
+  wooId?: number;
+  /** WooCommerce variation id for each option of a synced product. */
+  wooVariations?: Record<string, number>;
 }
 
 export const categories: { id: Category; name: string; blurb: string }[] = [

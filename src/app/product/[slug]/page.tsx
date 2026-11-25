@@ -7,21 +7,25 @@ import { CheckIcon, ReturnIcon, StarIcon, TruckIcon } from "@/components/Icons";
 import { ProductArt } from "@/components/ProductArt";
 import { ProductCard } from "@/components/ProductCard";
 import { money } from "@/lib/format";
-import { categories, getProduct, products } from "@/lib/products";
+import { findProduct, getCatalog } from "@/lib/catalog";
+import { categories } from "@/lib/products";
 import { fulfilment, site } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export const generateStaticParams = () => products.map((p) => ({ slug: p.slug }));
+export const revalidate = 300;
+export const dynamicParams = true;
+export const generateStaticParams = async () => (await getCatalog()).map((p) => ({ slug: p.slug }));
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = getProduct((await params).slug);
+  const product = await findProduct((await params).slug);
   return product ? { title: product.name, description: product.description } : {};
 }
 
 export default async function ProductPage({ params }: Props) {
-  const product = getProduct((await params).slug);
+  const product = await findProduct((await params).slug);
   if (!product) notFound();
+  const products = await getCatalog();
 
   const f = fulfilment[product.source];
   const category = categories.find((c) => c.id === product.category)!;

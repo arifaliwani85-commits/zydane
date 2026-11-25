@@ -7,6 +7,7 @@ import { CartDrawer } from "@/components/CartDrawer";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { CartProvider } from "@/lib/cart";
+import { getCartCatalog } from "@/lib/catalog";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -16,11 +17,12 @@ export const metadata: Metadata = {
   openGraph: { title: site.name, description: site.description, type: "website" },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const catalog = await getCartCatalog();
   return (
     <html lang="en" className={GeistSans.variable}>
       <body>
-        <CartProvider>
+        <CartProvider catalog={catalog}>
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:text-paper">
             Skip to content
           </a>

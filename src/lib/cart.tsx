@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { getProduct, type Product } from "./products";
+import type { CartProduct } from "./catalog";
 
 export interface CartLine {
   slug: string;
@@ -11,7 +11,7 @@ export interface CartLine {
 
 export interface ResolvedLine extends CartLine {
   key: string;
-  product: Product;
+  product: CartProduct;
 }
 
 interface CartState {
@@ -31,7 +31,7 @@ const keyOf = (l: { slug: string; variant?: string }) => `${l.slug}::${l.variant
 
 const CartContext = createContext<CartState | null>(null);
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({ children, catalog }: { children: React.ReactNode; catalog: CartProduct[] }) {
   const [raw, setRaw] = useState<CartLine[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
@@ -79,7 +79,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<CartState>(() => {
     const lines = raw.flatMap((l) => {
-      const product = getProduct(l.slug);
+      const product = catalog.find((p) => p.slug === l.slug);
       return product ? [{ ...l, key: keyOf(l), product }] : [];
     });
     return {
@@ -93,7 +93,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       remove,
       clear,
     };
-  }, [raw, open, add, setQty, remove, clear]);
+  }, [raw, open, add, setQty, remove, clear, catalog]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

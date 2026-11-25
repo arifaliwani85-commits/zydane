@@ -56,3 +56,11 @@ The catalogue, reviews, ratings and customer statistics are **sample content**. 
 The store is deployed to Hostinger at **https://zydane.com** (and a copy at shop.zydane.com) and redeploys automatically on every push to the deployed branch.
 
 The build uses webpack (`next build --webpack`) and a JavaScript config file, because Hostinger's build servers have an older system library (glibc) than Next.js's default compiler needs. Keep both when changing the build setup.
+
+## AliDropship back office
+
+Curated Finds come from **admin.zydane.com**, a WordPress + WooCommerce site running the AliDropship Woo plugin.
+
+- **Products:** import products with AliDropship as usual and publish them. The store picks them up within 5 minutes and shows them in Curated Finds (replacing the sample curated products). Name WooCommerce categories Home, Wellness, Carry, Tech or Kids to place products in the store's categories.
+- **Orders:** when a customer pays with Stripe, the AliDropship items of the order are created as a paid "Processing" order in WooCommerce, where AliDropship places them with the supplier. Demo-mode orders (no Stripe key) are never forwarded.
+- **Settings** (Hostinger → zydane.com → Node.js → Environment variables, then redeploy): `WC_URL`, `WC_KEY`, `WC_SECRET` (a WooCommerce REST API key with Read/Write access) and `STRIPE_WEBHOOK_SECRET`. In Stripe, add the webhook `https://zydane.com/api/stripe/webhook` for `checkout.session.completed`.

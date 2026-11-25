@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { priceOrder, routeOrder } from "@/lib/orders";
+import { countries } from "@/lib/countries";
+import { encodeWooLines, priceOrder, routeOrder } from "@/lib/orders";
 import { site } from "@/lib/site";
 
 const clean = (v: unknown, max = 120) => String(v ?? "").trim().slice(0, max);
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const order = Array.isArray(body.items) && body.items.length <= 50 ? priceOrder(body.items) : null;
+  const order = Array.isArray(body.items) && body.items.length <= 50 ? await priceOrder(body.items) : null;
   if (!order) return NextResponse.json({ error: "Your bag is empty or contains an unavailable item." }, { status: 400 });
 
   const c = body.customer ?? {};
@@ -22,9 +23,9 @@ export async function POST(req: Request) {
     address: clean(c.address, 200),
     city: clean(c.city),
     postcode: clean(c.postcode, 20),
-    country: clean(c.country, 60),
+    country: clean(c.country, 2).toUpperCase(),
   };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email) || !customer.name || !customer.address || !customer.city || !customer.postcode || !customer.country) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email) || !customer.name || !customer.address || !customer.city || !customer.postcode || !countries.some(([code]) => code === customer.country)) {
     return NextResponse.json({ error: "Please complete your contact and delivery details." }, { status: 400 });
   }
 
@@ -33,7 +34,8 @@ export async function POST(req: Request) {
 
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
-    // Demo mode: no payment is taken. Add STRIPE_SECRET_KEY to go live.
+    // Demo mode: no payment is taken, so nothing is sent to AliDropship either
+    // (it would buy from the supplier for an unpaid order). Add STRIPE_SECRET_KEY to go live.
     console.info("[order:demo]", id, JSON.stringify({ total: order.total, shipments }));
     return NextResponse.json({
       demo: true,
@@ -56,7 +58,13 @@ export async function POST(req: Request) {
     customer_email: customer.email,
     client_reference_id: id,
     "metadata[order_id]": id,
-    "metadata[ship_to]": `${customer.name}, ${customer.address}, ${customer.city} ${customer.postcode}, ${customer.country}`.slice(0, 500),
+    "metadata[name]": customer.name,
+    "metadata[address]": customer.address,
+    "metadata[city]": customer.city,
+    "metadata[postcode]": customer.postcode,
+    "metadata[country]": customer.country,
+    "metadata[shipping]": order.shipping.toFixed(2),
+    "metadata[woo_lines]": encodeWooLines(order.lines),
     "metadata[shipments]": JSON.stringify(shipments).slice(0, 500),
   });
   order.lines.forEach((l, i) => {

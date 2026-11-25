@@ -5,7 +5,13 @@ import type { Product } from "@/lib/products";
  * Studio-style product visual. Uses the product photo when `image` is set,
  * otherwise draws a soft-lit illustration from the product's shape and tones.
  */
-export function ProductArt({ product, className = "" }: { product: Product; className?: string }) {
+export function ProductArt({
+  product,
+  className = "",
+}: {
+  product: Pick<Product, "slug" | "name" | "image" | "art" | "tone">;
+  className?: string;
+}) {
   if (product.image) {
     return (
       // eslint-disable-next-line @next/next/no-img-element

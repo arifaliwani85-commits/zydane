@@ -1,5 +1,8 @@
+import "server-only";
+import { getCatalog } from "./catalog";
 import { shippingFor } from "./format";
-import { getProduct, type Product } from "./products";
+import type { Product } from "./products";
+import { createWooOrder, wooEnabled, wooOrderExists } from "./woo";
 
 export interface OrderItemInput {
   slug: string;
@@ -13,11 +16,21 @@ export interface OrderLine {
   qty: number;
 }
 
+export interface Customer {
+  email: string;
+  name: string;
+  address: string;
+  city: string;
+  postcode: string;
+  country: string;
+}
+
 /** Re-prices a cart from the catalogue. Never trust prices sent by the browser. */
-export function priceOrder(items: OrderItemInput[]) {
+export async function priceOrder(items: OrderItemInput[]) {
+  const catalog = await getCatalog();
   const lines: OrderLine[] = [];
   for (const item of items) {
-    const product = getProduct(String(item.slug));
+    const product = catalog.find((p) => p.slug === String(item.slug));
     const qty = Math.floor(Number(item.qty));
     if (!product || !(qty >= 1 && qty <= 99)) return null;
     const variant = product.variants
@@ -31,12 +44,51 @@ export function priceOrder(items: OrderItemInput[]) {
   return { lines, subtotal, shipping, total: subtotal + shipping };
 }
 
+/** Compact form of the AliDropship lines, small enough for Stripe metadata: "wooId:variationId:qty:price;…". */
+export function encodeWooLines(lines: OrderLine[]) {
+  return lines
+    .filter((l) => l.product.wooId)
+    .map((l) => [l.product.wooId, (l.variant && l.product.wooVariations?.[l.variant]) || 0, l.qty, l.product.price].join(":"))
+    .join(";");
+}
+
+function decodeWooLines(encoded: string) {
+  return encoded
+    .split(";")
+    .filter(Boolean)
+    .map((part) => {
+      const [wooId, variationId, qty, price] = part.split(":").map(Number);
+      return { wooId, variationId: variationId || undefined, qty, price };
+    })
+    .filter((l) => l.wooId > 0 && l.qty > 0);
+}
+
 /**
- * Splits an order into shipments: one from your own warehouse (private label)
- * and one per dropship supplier. This is the hand-off point for automating
- * supplier purchase orders — email them, call their API, or push to a tool
- * like AutoDS / DSers from here.
+ * Sends the AliDropship items of a paid order to the back office, where
+ * AliDropship places them with the supplier. Safe to call more than once for
+ * the same reference. Returns the WooCommerce order id, or null if there was
+ * nothing to send.
  */
+export async function fulfilViaAliDropship(params: {
+  reference: string;
+  customer: Customer;
+  wooLines: string;
+  shipping: number;
+  paymentTitle: string;
+}): Promise<number | null> {
+  const lines = decodeWooLines(params.wooLines);
+  if (!wooEnabled || lines.length === 0) return null;
+  if (await wooOrderExists(params.reference)) return null;
+  return createWooOrder({
+    reference: params.reference,
+    ...params.customer,
+    paymentTitle: params.paymentTitle,
+    lines,
+    shipping: params.shipping,
+  });
+}
+
+/** Splits an order into shipments: one from your own warehouse and one per supplier. */
 export function routeOrder(lines: OrderLine[]) {
   const shipments = new Map<string, { fulfilledBy: string; items: { sku: string; name: string; variant?: string; qty: number }[] }>();
   for (const l of lines) {

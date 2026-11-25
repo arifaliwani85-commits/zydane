@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ProductArt } from "@/components/ProductArt";
 import { useCart } from "@/lib/cart";
+import { countries } from "@/lib/countries";
 import { money, shippingFor } from "@/lib/format";
 import { fulfilment } from "@/lib/site";
 
@@ -14,7 +15,6 @@ const fields = [
   { name: "address", label: "Address", type: "text", autoComplete: "street-address", span: 2 },
   { name: "city", label: "City", type: "text", autoComplete: "address-level2", span: 1 },
   { name: "postcode", label: "Postal code", type: "text", autoComplete: "postal-code", span: 1 },
-  { name: "country", label: "Country", type: "text", autoComplete: "country-name", span: 2 },
 ];
 
 export default function Checkout() {
@@ -76,6 +76,16 @@ export default function Checkout() {
               <input name={f.name} type={f.type} autoComplete={f.autoComplete} required className="field" />
             </label>
           ))}
+          <label className="col-span-2">
+            <span className="mb-1.5 block text-xs text-ink-soft">Country</span>
+            <select name="country" required autoComplete="country" defaultValue="US" className="field appearance-none">
+              {countries.map(([code, label]) => (
+                <option key={code} value={code}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {error && <p role="alert" className="mt-6 rounded-xl bg-[#F6E3DC] px-4 py-3 text-sm text-[#8A2E14]">{error}</p>}
