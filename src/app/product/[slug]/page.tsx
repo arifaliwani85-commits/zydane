@@ -124,7 +124,7 @@ export default async function ProductPage({ params }: Props) {
           {product.available && (
           <ul className="mt-8 space-y-3 rounded-2xl bg-shell p-6 text-sm">
             <li className="flex gap-3"><TruckIcon className="mt-0.5 shrink-0 text-forest" /><span><span className="font-medium">{f.shipping}.</span> {f.delivery}.</span></li>
-            <li className="flex gap-3"><ReturnIcon className="mt-0.5 shrink-0 text-forest" /><span>30-day returns and free shipping over {money(market.freeShippingThreshold)}.</span></li>
+            <li className="flex gap-3"><ReturnIcon className="mt-0.5 shrink-0 text-forest" /><span>30-day returns and free shipping on every order.</span></li>
           </ul>
           )}
 

@@ -21,8 +21,7 @@ export default function Checkout() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const { market, money, shippingFor } = useMarket();
-  const shipping = shippingFor(subtotal);
+  const { market, money } = useMarket();
   const sources = [...new Set(lines.map((l) => l.product.source))];
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -91,7 +90,7 @@ export default function Checkout() {
         {error && <p role="alert" className="mt-6 rounded-xl bg-[#F6E3DC] px-4 py-3 text-sm text-[#8A2E14]">{error}</p>}
 
         <button disabled={busy} className="btn btn-dark mt-8 !h-14 w-full text-[15px]">
-          {busy ? "Processing…" : `Continue to payment — ${money(subtotal + shipping)}`}
+          {busy ? "Processing…" : `Continue to payment — ${money(subtotal)}`}
         </button>
         <p className="mt-4 text-center text-xs text-ink-faint">Payments are encrypted and processed by Stripe. We never see your card details.</p>
       </form>
@@ -115,8 +114,8 @@ export default function Checkout() {
         </ul>
         <dl className="mt-4 space-y-2.5 border-t border-line pt-5 text-sm">
           <div className="flex justify-between"><dt className="text-ink-soft">Subtotal</dt><dd className="tabular-nums">{money(subtotal)}</dd></div>
-          <div className="flex justify-between"><dt className="text-ink-soft">Shipping</dt><dd>{shipping === 0 ? "Complimentary" : money(shipping)}</dd></div>
-          <div className="flex items-baseline justify-between pt-3"><dt className="font-medium">Total</dt><dd className="display text-4xl tabular-nums">{money(subtotal + shipping)}</dd></div>
+          <div className="flex justify-between"><dt className="text-ink-soft">Shipping</dt><dd className="font-medium text-forest">Free</dd></div>
+          <div className="flex items-baseline justify-between pt-3"><dt className="font-medium">Total</dt><dd className="display text-4xl tabular-nums">{money(subtotal)}</dd></div>
         </dl>
         {sources.length > 0 && (
           <div className="mt-6 space-y-1.5 rounded-2xl bg-paper p-4 text-[13px] text-ink-soft">

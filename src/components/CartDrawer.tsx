@@ -9,9 +9,7 @@ import { ProductArt } from "./ProductArt";
 
 export function CartDrawer() {
   const { open, setOpen, lines, subtotal, count, setQty, remove } = useCart();
-  const { market, money, shippingFor } = useMarket();
-  const remaining = Math.max(0, market.freeShippingThreshold - subtotal);
-  const progress = Math.min(100, (subtotal / market.freeShippingThreshold) * 100);
+  const { money } = useMarket();
 
   useEffect(() => {
     if (!open) return;
@@ -47,23 +45,6 @@ export function CartDrawer() {
             <CloseIcon />
           </button>
         </div>
-
-        {lines.length > 0 && (
-          <div className="px-6 pb-5">
-            <p className="text-[13px] text-ink-soft">
-              {remaining > 0 ? (
-                <>
-                  You&apos;re <span className="font-medium text-ink">{money(remaining)}</span> away from complimentary shipping
-                </>
-              ) : (
-                <span className="font-medium text-forest">You&apos;ve unlocked complimentary shipping</span>
-              )}
-            </p>
-            <div className="mt-2.5 h-[3px] overflow-hidden rounded-full bg-line">
-              <div className="h-full rounded-full bg-forest transition-all duration-700 ease-out-soft" style={{ width: `${progress}%` }} />
-            </div>
-          </div>
-        )}
 
         {lines.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
@@ -112,7 +93,7 @@ export function CartDrawer() {
             <div className="space-y-4 p-6">
               <div className="flex justify-between text-sm text-ink-soft">
                 <span>Shipping</span>
-                <span>{shippingFor(subtotal) === 0 ? "Complimentary" : money(shippingFor(subtotal))}</span>
+                <span className="font-medium text-forest">Free</span>
               </div>
               <div className="flex items-baseline justify-between">
                 <span className="text-sm">Subtotal</span>

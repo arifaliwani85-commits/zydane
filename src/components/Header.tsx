@@ -20,7 +20,7 @@ export function Header() {
   const { count, setOpen } = useCart();
   const { market, money } = useMarket();
   const notes = [
-    `Complimentary shipping over ${money(market.freeShippingThreshold)}`,
+    "Free shipping on every order",
     "30-day returns, no questions",
     "Zydane Line ships within 24 hours",
     "Carbon-neutral delivery on every order",

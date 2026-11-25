@@ -24,7 +24,7 @@ npm run build && npm start   # production
 | What | Where |
 | --- | --- |
 | Store name, support email | `src/lib/site.ts` |
-| Markets (UK / US): currency, delivery countries, shipping fee, free-shipping limit, exchange rate | `src/lib/site.ts` |
+| Markets (UK / US): currency, delivery countries, exchange rate | `src/lib/site.ts` |
 | Products, prices, variants, suppliers | `src/lib/products.ts` |
 | Colours and fonts | `src/app/globals.css` |
 | Home page copy, reviews and statistics | `src/app/page.tsx` |
@@ -72,5 +72,6 @@ Each product has **one listing**. Visitors see prices in the currency of their m
 
 - **Prices:** set `prices: { GBP: { price, compareAt }, USD: … }` on a product for exact prices. Without one, the `price` (in US dollars) is converted at the rate in `site.ts` and rounded to .99.
 - **One market only:** add `markets: ["GB"]` to a product (the Face & Neck Massage Set does this). US visitors see a "not available" notice and cannot buy it.
+- **Shipping:** free on every order, in both markets.
 - **Checkout:** the server decides the market, re-prices the order in that currency and only accepts delivery to that market's country. Stripe is charged in the same currency.
 - **Back office:** prices entered in AliDropship/WooCommerce are read in the currency set in WooCommerce → Settings → General (GBP or USD) and converted for the other market.

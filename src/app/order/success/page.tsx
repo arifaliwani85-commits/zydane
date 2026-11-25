@@ -57,7 +57,7 @@ export default function OrderSuccess() {
             ))}
           </ul>
           <dl className="mt-3 space-y-2 border-t border-line pt-4 text-sm">
-            <div className="flex justify-between"><dt className="text-ink-soft">Shipping</dt><dd>{order.shipping === 0 ? "Complimentary" : money(order.shipping)}</dd></div>
+            <div className="flex justify-between"><dt className="text-ink-soft">Shipping</dt><dd className="font-medium text-forest">{order.shipping === 0 ? "Free" : money(order.shipping)}</dd></div>
             <div className="flex items-baseline justify-between"><dt className="font-medium">Total</dt><dd className="display text-3xl">{money(order.total)}</dd></div>
           </dl>
         </div>

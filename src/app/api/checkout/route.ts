@@ -82,12 +82,6 @@ export async function POST(req: Request) {
     form.set(`${p}[price_data][unit_amount]`, String(Math.round(l.product.price * 100)));
     form.set(`${p}[price_data][product_data][name]`, l.variant ? `${l.product.name} — ${l.variant}` : l.product.name);
   });
-  if (order.shipping > 0) {
-    form.set("shipping_options[0][shipping_rate_data][type]", "fixed_amount");
-    form.set("shipping_options[0][shipping_rate_data][display_name]", "Standard shipping");
-    form.set("shipping_options[0][shipping_rate_data][fixed_amount][amount]", String(Math.round(order.shipping * 100)));
-    form.set("shipping_options[0][shipping_rate_data][fixed_amount][currency]", market.currency.toLowerCase());
-  }
 
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",

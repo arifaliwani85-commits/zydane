@@ -2,14 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useMemo } from "react";
-import { formatMoney, shippingFor } from "./format";
+import { formatMoney } from "./format";
 import { markets, type Market, type MarketCode } from "./site";
 import { MARKET_COOKIE } from "./market-cookie";
 
 interface MarketState {
   market: Market;
   money: (n: number) => string;
-  shippingFor: (subtotal: number) => number;
   setMarket: (code: MarketCode) => void;
 }
 
@@ -31,7 +30,6 @@ export function MarketProvider({ code, children }: { code: MarketCode; children:
     () => ({
       market,
       money: (n) => formatMoney(n, market.currency),
-      shippingFor: (subtotal) => shippingFor(subtotal, market),
       setMarket,
     }),
     [market, setMarket],

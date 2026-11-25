@@ -1,6 +1,5 @@
 import "server-only";
 import { getCatalog } from "./catalog";
-import { shippingFor } from "./format";
 import type { Product } from "./products";
 import type { CurrencyCode, Market } from "./site";
 import { createWooOrder, wooEnabled, wooOrderExists } from "./woo";
@@ -41,8 +40,8 @@ export async function priceOrder(items: OrderItemInput[], market: Market) {
   }
   if (lines.length === 0) return null;
   const subtotal = lines.reduce((n, l) => n + l.product.price * l.qty, 0);
-  const shipping = shippingFor(subtotal, market);
-  return { lines, subtotal, shipping, total: subtotal + shipping };
+  // Shipping is free on every order.
+  return { lines, subtotal, shipping: 0, total: subtotal };
 }
 
 /** Compact form of the AliDropship lines, small enough for Stripe metadata: "wooId:variationId:qty:price;…". */

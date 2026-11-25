@@ -10,8 +10,8 @@ import { categories } from "@/lib/products";
 import { markets } from "@/lib/site";
 
 
-const promises = (free: string) => [
-  { icon: TruckIcon, title: "Fast, tracked delivery", text: `Free over ${free}. Our own line leaves the warehouse within 24 hours.` },
+const promises = [
+  { icon: TruckIcon, title: "Fast, tracked delivery", text: "Free shipping on every order. Our own line leaves the warehouse within 24 hours." },
   { icon: ReturnIcon, title: "30-day returns", text: "Changed your mind? Send it back within 30 days for a full refund." },
   { icon: ShieldIcon, title: "Vetted, every piece", text: "We test each product ourselves before it earns a place in the shop." },
   { icon: LeafIcon, title: "Made responsibly", text: "Plastic-free packaging and carbon-neutral shipping as standard." },
@@ -179,7 +179,7 @@ export default async function Home() {
       {/* Promise */}
       <section id="promise" className="container-x scroll-mt-24 pt-24">
         <div className="grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-          {promises(money(market.freeShippingThreshold)).map((p) => (
+          {promises.map((p) => (
             <div key={p.title} className="bg-paper p-8">
               <p.icon width={26} height={26} className="text-forest" />
               <h3 className="mt-6 text-[15px] font-medium">{p.title}</h3>

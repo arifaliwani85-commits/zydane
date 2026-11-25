@@ -10,13 +10,9 @@ export interface Market {
   locale: string;
   /** Countries a customer can ship to from this market, as [ISO code, name]. */
   countries: [string, string][];
-  /** Orders at or above this subtotal ship free. */
-  freeShippingThreshold: number;
-  /** Flat shipping fee below the threshold. */
-  shippingFlat: number;
 }
 
-/** The markets you sell in. A visitor sees prices in one market's currency at a time. */
+/** The markets you sell in. A visitor sees prices in one market's currency at a time. Shipping is free on every order. */
 export const markets: Record<MarketCode, Market> = {
   GB: {
     code: "GB",
@@ -25,8 +21,6 @@ export const markets: Record<MarketCode, Market> = {
     currency: "GBP",
     locale: "en-GB",
     countries: [["GB", "United Kingdom"]],
-    freeShippingThreshold: 60,
-    shippingFlat: 4.99,
   },
   US: {
     code: "US",
@@ -35,8 +29,6 @@ export const markets: Record<MarketCode, Market> = {
     currency: "USD",
     locale: "en-US",
     countries: [["US", "United States"]],
-    freeShippingThreshold: 75,
-    shippingFlat: 6,
   },
 };
 

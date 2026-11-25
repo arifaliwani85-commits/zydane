@@ -1,4 +1,4 @@
-import type { CurrencyCode, Market } from "./site";
+import type { CurrencyCode } from "./site";
 
 const localeOf: Record<CurrencyCode, string> = { GBP: "en-GB", USD: "en-US" };
 const formatters = new Map<CurrencyCode, Intl.NumberFormat>();
@@ -12,6 +12,4 @@ export function formatMoney(n: number, currency: CurrencyCode) {
   return f.format(n);
 }
 
-export const shippingFor = (subtotal: number, market: Market) =>
-  subtotal === 0 || subtotal >= market.freeShippingThreshold ? 0 : market.shippingFlat;
 
