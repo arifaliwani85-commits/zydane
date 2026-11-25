@@ -122,6 +122,67 @@ export const products: Product[] = [
     featured: true,
   },
   {
+    slug: "face-neck-massage-set",
+    name: "Face & Neck Massage Set",
+    subtitle: "LED face & neck massager with jade gua sha",
+    price: 19.99,
+    category: "wellness",
+    source: "house",
+    description:
+      "A spa-like face and neck ritual at home. The Zydane Aesthetics massager combines EMS microcurrent, soothing 45°C warmth and 7 LED light colours across three modes, with an ergonomic head that follows the curves of your jawline and neck. It comes with a hand-polished jade gua sha for gentle sculpting, so you can massage, de-puff and refresh in a few minutes a day. Rechargeable over USB-C and light enough to travel with.",
+    details: [
+      "3 massage modes: Clean, EMS and Hot",
+      "7 LED colours: red, blue, green, yellow, cyan, purple and white",
+      "Soothing warmth at a constant 45 ± 5 °C (113 ± 9 °F)",
+      "400 mAh rechargeable battery, 1–2 hours of use",
+      "USB-C charging (5 V / 1 A), about 3 hours to full",
+      "ABS with electroplated finish, 3 W rated power",
+      "Massager 13.9 × 9.0 cm, approx. 85 g",
+      "In the box: massager, jade gua sha, USB-C cable, user manual, gift box",
+    ],
+    highlights: [
+      {
+        title: "Three modes, one device",
+        text: "Switch between Clean, EMS and Hot with a single button. Gentle EMS microcurrent helps tone, while soothing warmth relaxes tired muscles.",
+      },
+      {
+        title: "7 LED light colours",
+        text: "Red to revitalise and energise, blue to soothe and balance, purple to combine both — plus green, yellow, cyan and white for a refreshed-looking glow.",
+      },
+      {
+        title: "Jade gua sha included",
+        text: "A hand-polished jade stone for gentle facial sculpting, de-puffing and lymphatic massage. Use it after the massager to finish your routine.",
+      },
+      {
+        title: "An easy 4-step routine",
+        text: "Cleanse, massage in your preferred mode, sculpt with the gua sha, then finish with your favourite serum or moisturiser.",
+      },
+      {
+        title: "Rechargeable and travel-friendly",
+        text: "USB-C charging and a 400 mAh battery give 1–2 hours of use per charge. At around 85 g, it slips easily into a wash bag.",
+      },
+      {
+        title: "Gift-ready packaging",
+        text: "Arrives in a premium Zydane Aesthetics gift box — a thoughtful present for birthdays, holidays or anyone who deserves a little self-care.",
+      },
+    ],
+    badge: "New",
+    art: "bottle",
+    tone: ["#E7EEE8", "#1F4A35"],
+    image: "/products/face-massager/1.jpg",
+    gallery: [
+      "/products/face-massager/2.jpg",
+      "/products/face-massager/3.jpg",
+      "/products/face-massager/4.jpg",
+      "/products/face-massager/5.jpg",
+      "/products/face-massager/6.jpg",
+      "/products/face-massager/7.jpg",
+      "/products/face-massager/8.jpg",
+      "/products/face-massager/9.jpg",
+    ],
+    featured: true,
+  },
+  {
     slug: "atlas-ceramic-mug",
     name: "Atlas Ceramic Mug",
     subtitle: "Hand-glazed stoneware, 350 ml",

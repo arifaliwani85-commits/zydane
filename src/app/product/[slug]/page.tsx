@@ -138,7 +138,7 @@ export default async function ProductPage({ params }: Props) {
 
       {product.highlights && (
         <section className="mt-24 rounded-[28px] bg-shell px-6 py-14 sm:px-12 lg:py-20">
-          <p className="eyebrow">Why kids love it</p>
+          <p className="eyebrow">Why you&apos;ll love it</p>
           <h2 className="display mt-4 max-w-[18ch] text-5xl sm:text-6xl">{product.name}</h2>
           <div className="mt-12 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {product.highlights.map((h, i) => (
