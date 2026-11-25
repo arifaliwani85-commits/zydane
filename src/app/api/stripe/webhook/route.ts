@@ -50,6 +50,7 @@ export async function POST(req: Request) {
         name: m.name ?? "",
         address: m.address ?? "",
         city: m.city ?? "",
+        region: m.region ?? "",
         postcode: m.postcode ?? "",
         country: m.country ?? "",
       },

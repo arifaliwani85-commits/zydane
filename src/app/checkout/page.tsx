@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProductArt } from "@/components/ProductArt";
 import { useCart } from "@/lib/cart";
 import { useMarket } from "@/lib/market-client";
@@ -16,6 +16,11 @@ const fields = [
   { name: "postcode", label: "Postal code", type: "text", autoComplete: "postal-code", span: 1 },
 ];
 
+interface Methods {
+  card: boolean;
+  paypal: boolean;
+}
+
 export default function Checkout() {
   const { lines, subtotal } = useCart();
   const router = useRouter();
@@ -23,9 +28,22 @@ export default function Checkout() {
   const [error, setError] = useState("");
   const { market, money } = useMarket();
   const sources = [...new Set(lines.map((l) => l.product.source))];
+  const [methods, setMethods] = useState<Methods | null>(null);
+
+  useEffect(() => {
+    fetch("/api/checkout")
+      .then((r) => r.json())
+      .then(setMethods)
+      .catch(() => setMethods({ card: true, paypal: false }));
+    if (new URLSearchParams(window.location.search).get("error") === "paypal") {
+      setError("Your PayPal payment wasn't completed and you haven't been charged. Please try again or pay by card.");
+    }
+  }, []);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    const method = submitter?.value === "paypal" ? "paypal" : "card";
     setBusy(true);
     setError("");
     try {
@@ -33,6 +51,7 @@ export default function Checkout() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          method,
           customer: Object.fromEntries(new FormData(e.currentTarget)),
           items: lines.map(({ slug, variant, qty }) => ({ slug, variant, qty })),
         }),
@@ -75,7 +94,11 @@ export default function Checkout() {
               <input name={f.name} type={f.type} autoComplete={f.autoComplete} required className="field" />
             </label>
           ))}
-          <label className="col-span-2">
+          <label className="col-span-2 sm:col-span-1">
+            <span className="mb-1.5 block text-xs text-ink-soft">{market.code === "US" ? "State (e.g. TX)" : "County (optional)"}</span>
+            <input name="region" type="text" autoComplete="address-level1" required={market.code === "US"} className="field" />
+          </label>
+          <label className="col-span-2 sm:col-span-1">
             <span className="mb-1.5 block text-xs text-ink-soft">Country</span>
             <select key={market.code} name="country" required autoComplete="country" defaultValue={market.countries[0][0]} className="field appearance-none">
               {market.countries.map(([code, label]) => (
@@ -89,10 +112,32 @@ export default function Checkout() {
 
         {error && <p role="alert" className="mt-6 rounded-xl bg-[#F6E3DC] px-4 py-3 text-sm text-[#8A2E14]">{error}</p>}
 
-        <button disabled={busy} className="btn btn-dark mt-8 !h-14 w-full text-[15px]">
-          {busy ? "Processing…" : `Continue to payment — ${money(subtotal)}`}
-        </button>
-        <p className="mt-4 text-center text-xs text-ink-faint">Payments are encrypted and processed by Stripe. We never see your card details.</p>
+        <div className="mt-8 space-y-3">
+          {methods && !methods.card && !methods.paypal ? (
+            <>
+              <button disabled={busy} value="card" className="btn btn-dark !h-14 w-full text-[15px]">
+                {busy ? "Processing…" : `Place test order — ${money(subtotal)}`}
+              </button>
+              <p className="text-center text-xs text-ink-faint">Payments aren&apos;t switched on yet, so this places a test order and takes no money.</p>
+            </>
+          ) : (
+            <>
+              {(methods?.card ?? true) && (
+                <button disabled={busy || !methods} value="card" className="btn btn-dark !h-14 w-full text-[15px]">
+                  {busy ? "Processing…" : `Pay by card — ${money(subtotal)}`}
+                </button>
+              )}
+              {methods?.paypal && (
+                <button disabled={busy} value="paypal" className="btn !h-14 w-full border border-ink/20 bg-[#FFC439] text-[15px] font-semibold text-[#111] hover:bg-[#f5b800]">
+                  {busy ? "Processing…" : "Pay with PayPal"}
+                </button>
+              )}
+              <p className="text-center text-xs text-ink-faint">
+                {methods?.paypal ? "Card payments are processed by Stripe and PayPal payments by PayPal." : "Card payments are processed by Stripe."} We never see your card details.
+              </p>
+            </>
+          )}
+        </div>
       </form>
 
       <aside className="h-fit rounded-[28px] bg-shell p-6 sm:p-8 lg:sticky lg:top-28">

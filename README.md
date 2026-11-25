@@ -37,12 +37,19 @@ To use real photos, put them in `public/products/` and set `image: "/products/yo
 
 ### Payments
 
-Without a Stripe key the checkout runs in **demo mode**: orders complete but no payment is taken. To take real payments, copy `.env.example` to `.env.local` and set:
+The checkout offers **Pay by card** (Stripe, which also shows Apple Pay and Google Pay when you turn them on in Stripe) and **Pay with PayPal**. Each button appears only when its keys are set. With neither set, checkout is in test mode: orders complete but no money is taken and nothing is sent to suppliers.
 
-```
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
-STRIPE_SECRET_KEY=sk_live_...
-```
+Set these on the hosting (Hostinger → zydane.com → Node.js → Environment variables), never in the code, then redeploy:
+
+| Setting | What it is |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | `https://zydane.com` |
+| `STRIPE_SECRET_KEY` | Stripe → Developers → API keys → Secret key (`sk_live_…`) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe → Developers → Webhooks → add `https://zydane.com/api/stripe/webhook` for `checkout.session.completed`, then copy its signing secret |
+| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | PayPal → developer.paypal.com → Apps & Credentials → your Live app |
+| `PAYPAL_ENV` | `sandbox` while testing with sandbox credentials; leave out for live |
+
+PayPal payments are taken when the customer returns to `/api/paypal/return`. Reloading that page is safe: nothing is charged or ordered twice.
 
 ### Dropship fulfilment
 

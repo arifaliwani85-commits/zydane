@@ -20,9 +20,11 @@ interface Order {
 export default function OrderSuccess() {
   const { clear } = useCart();
   const [order, setOrder] = useState<Order | null>(null);
+  const [ref, setRef] = useState("");
 
   useEffect(() => {
     clear();
+    setRef(new URLSearchParams(window.location.search).get("ref")?.replace(/[^A-Za-z0-9-]/g, "").slice(0, 20) ?? "");
     try {
       const saved = sessionStorage.getItem("zydane-last-order");
       if (saved) setOrder(JSON.parse(saved));
@@ -43,7 +45,7 @@ export default function OrderSuccess() {
       <p className="mt-5 max-w-md text-ink-soft">
         {order
           ? <>Order <span className="font-medium text-ink">{order.id}</span> is confirmed. A receipt is on its way to {order.email}.</>
-          : "Your order is confirmed and a receipt is on its way to your inbox."}
+          : ref ? <>Order <span className="font-medium text-ink">{ref}</span> is confirmed. A receipt is on its way to your inbox.</> : "Your order is confirmed and a receipt is on its way to your inbox."}
       </p>
 
       {order && (

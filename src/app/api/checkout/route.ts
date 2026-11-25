@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { getMarket } from "@/lib/market";
 import { encodeWooLines, priceOrder, routeOrder } from "@/lib/orders";
+import { createPayPalOrder } from "@/lib/paypal";
+import { newOrderId, paymentMethods, siteOrigin } from "@/lib/payments";
 import { markets } from "@/lib/site";
 
 const clean = (v: unknown, max = 120) => String(v ?? "").trim().slice(0, max);
 
+/** Tells the checkout page which payment buttons to show. */
+export async function GET() {
+  return NextResponse.json(paymentMethods(), { headers: { "Cache-Control": "no-store" } });
+}
+
 export async function POST(req: Request) {
-  let body: { items?: unknown; customer?: Record<string, unknown> };
+  let body: { items?: unknown; customer?: Record<string, unknown>; method?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -24,6 +31,7 @@ export async function POST(req: Request) {
     name: clean(c.name),
     address: clean(c.address, 200),
     city: clean(c.city),
+    region: clean(c.region, 40),
     postcode: clean(c.postcode, 20),
     country: clean(c.country, 2).toUpperCase(),
   };
@@ -31,17 +39,49 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Please complete your contact and delivery details." }, { status: 400 });
   }
 
+  if (customer.country === "US" && !customer.region) {
+    return NextResponse.json({ error: "Please enter your state." }, { status: 400 });
+  }
   if (!market.countries.some(([code]) => code === customer.country)) {
     return NextResponse.json({ error: `We currently deliver to ${market.countries.map(([, n]) => n).join(", ")} from this store.` }, { status: 400 });
   }
 
-  const id = `ZY-${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1296).toString(36).toUpperCase().padStart(2, "0")}`;
+  const id = newOrderId();
   const shipments = routeOrder(order.lines);
 
+  const methods = paymentMethods();
+  const method = body.method === "paypal" ? "paypal" : "card";
+  const origin = siteOrigin(req);
+
+  if (method === "paypal" && methods.paypal) {
+    try {
+      const paypal = await createPayPalOrder({
+        reference: id,
+        currency: market.currency,
+        customer,
+        lines: order.lines.map((l) => ({
+          name: l.variant ? `${l.product.name} — ${l.variant}` : l.product.name,
+          qty: l.qty,
+          price: l.product.price,
+          sku: l.product.wooId ? `woo:${l.product.wooId}:${(l.variant && l.product.wooVariations?.[l.variant]) || 0}` : l.product.slug,
+        })),
+        returnUrl: `${origin}/api/paypal/return`,
+        cancelUrl: `${origin}/checkout`,
+      });
+      return NextResponse.json({ url: paypal.url });
+    } catch (err) {
+      console.error("[paypal]", err instanceof Error ? err.message : err);
+      return NextResponse.json({ error: "We couldn't start the PayPal payment. Please try again or pay by card." }, { status: 502 });
+    }
+  }
+
   const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
+  if (!key || method !== "card") {
+    if (methods.card || methods.paypal) {
+      return NextResponse.json({ error: "That payment method isn't available. Please choose another." }, { status: 400 });
+    }
     // Demo mode: no payment is taken, so nothing is sent to AliDropship either
-    // (it would buy from the supplier for an unpaid order). Add STRIPE_SECRET_KEY to go live.
+    // (it would buy from the supplier for an unpaid order). Add payment keys to go live.
     console.info("[order:demo]", id, JSON.stringify({ total: order.total, shipments }));
     return NextResponse.json({
       demo: true,
@@ -57,7 +97,6 @@ export async function POST(req: Request) {
     });
   }
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin;
   const form = new URLSearchParams({
     mode: "payment",
     success_url: `${origin}/order/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -68,6 +107,7 @@ export async function POST(req: Request) {
     "metadata[name]": customer.name,
     "metadata[address]": customer.address,
     "metadata[city]": customer.city,
+    "metadata[region]": customer.region,
     "metadata[postcode]": customer.postcode,
     "metadata[country]": customer.country,
     "metadata[shipping]": order.shipping.toFixed(2),

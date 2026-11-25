@@ -21,6 +21,7 @@ export interface Customer {
   name: string;
   address: string;
   city: string;
+  region: string;
   postcode: string;
   country: string;
 }

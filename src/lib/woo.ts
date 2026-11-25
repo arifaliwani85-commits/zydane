@@ -185,6 +185,7 @@ export interface WooOrderInput {
   name: string;
   address: string;
   city: string;
+  region: string;
   postcode: string;
   country: string;
   paymentTitle: string;
@@ -204,6 +205,7 @@ export async function createWooOrder(o: WooOrderInput): Promise<number> {
     last_name: rest.join(" "),
     address_1: o.address,
     city: o.city,
+    state: o.region,
     postcode: o.postcode,
     country: o.country,
   };
