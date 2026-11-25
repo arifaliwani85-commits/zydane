@@ -6,26 +6,26 @@ import { Gallery } from "@/components/Gallery";
 import { CheckIcon, ReturnIcon, StarIcon, TruckIcon } from "@/components/Icons";
 import { ProductArt } from "@/components/ProductArt";
 import { ProductCard } from "@/components/ProductCard";
-import { money } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
+import { getMarket } from "@/lib/market";
 import { findProduct, getCatalog } from "@/lib/catalog";
 import { categories } from "@/lib/products";
-import { fulfilment, site } from "@/lib/site";
+import { fulfilment, markets, site } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export const revalidate = 300;
-export const dynamicParams = true;
-export const generateStaticParams = async () => (await getCatalog()).map((p) => ({ slug: p.slug }));
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await findProduct((await params).slug);
+  const product = await findProduct((await params).slug, await getMarket());
   return product ? { title: product.name, description: product.description } : {};
 }
 
 export default async function ProductPage({ params }: Props) {
-  const product = await findProduct((await params).slug);
+  const market = markets[await getMarket()];
+  const money = (n: number) => formatMoney(n, market.currency);
+  const product = await findProduct((await params).slug, market.code);
   if (!product) notFound();
-  const products = await getCatalog();
+  const products = await getCatalog(market.code);
 
   const f = fulfilment[product.source];
   const category = categories.find((c) => c.id === product.category)!;
@@ -41,7 +41,9 @@ export default async function ProductPage({ params }: Props) {
     description: product.description,
     brand: { "@type": "Brand", name: site.name },
     ...(product.image ? { image: [product.image, ...(product.gallery ?? [])] } : {}),
-    offers: { "@type": "Offer", price: product.price, priceCurrency: site.currency, availability: "https://schema.org/InStock" },
+    ...(product.available
+      ? { offers: { "@type": "Offer", price: product.price, priceCurrency: market.currency, availability: "https://schema.org/InStock" } }
+      : {}),
   };
 
   return (
@@ -92,21 +94,39 @@ export default async function ProductPage({ params }: Props) {
           </div>
           ) : null}
 
-          <p className="mt-7 flex items-baseline gap-3">
-            <span className="display text-5xl tabular-nums">{money(product.price)}</span>
-            {product.compareAt && <s className="text-lg text-ink-faint">{money(product.compareAt)}</s>}
-          </p>
+          {product.available && (
+            <p className="mt-7 flex items-baseline gap-3">
+              <span className="display text-5xl tabular-nums">{money(product.price)}</span>
+              {product.compareAt && <s className="text-lg text-ink-faint">{money(product.compareAt)}</s>}
+            </p>
+          )}
 
           <p className="mt-7 leading-relaxed text-ink-soft">{product.description}</p>
 
-          <div className="mt-9">
-            <AddToCart product={product} />
-          </div>
+          {product.available ? (
+            <div className="mt-9">
+              <AddToCart product={product} />
+            </div>
+          ) : (
+            <div className="mt-9 rounded-2xl border border-line p-6" role="status">
+              <p className="text-[15px] font-medium">
+                Not available in the {market.label} yet
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                This product is currently sold to customers in {product.markets?.map((m) => markets[m].label).join(" and ")} only.
+              </p>
+              <Link href="/shop" className="btn btn-outline mt-5">
+                Browse what&apos;s available
+              </Link>
+            </div>
+          )}
 
+          {product.available && (
           <ul className="mt-8 space-y-3 rounded-2xl bg-shell p-6 text-sm">
             <li className="flex gap-3"><TruckIcon className="mt-0.5 shrink-0 text-forest" /><span><span className="font-medium">{f.shipping}.</span> {f.delivery}.</span></li>
-            <li className="flex gap-3"><ReturnIcon className="mt-0.5 shrink-0 text-forest" /><span>30-day returns and free shipping over {money(site.freeShippingThreshold)}.</span></li>
+            <li className="flex gap-3"><ReturnIcon className="mt-0.5 shrink-0 text-forest" /><span>30-day returns and free shipping over {money(market.freeShippingThreshold)}.</span></li>
           </ul>
+          )}
 
           <div className="mt-8 divide-y divide-line border-y border-line">
             <details open className="group py-5">

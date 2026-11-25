@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
-import { money } from "@/lib/format";
+import { useMarket } from "@/lib/market-client";
 import { site } from "@/lib/site";
+import { MarketSwitch } from "./MarketSwitch";
 import { BagIcon, CloseIcon, MenuIcon, SearchIcon } from "./Icons";
 
 const nav = [
@@ -15,15 +16,15 @@ const nav = [
   { href: "/#story", label: "Our story" },
 ];
 
-const notes = [
-  `Complimentary shipping over ${money(site.freeShippingThreshold)}`,
-  "30-day returns, no questions",
-  "Zydane Line ships within 24 hours",
-  "Carbon-neutral delivery on every order",
-];
-
 export function Header() {
   const { count, setOpen } = useCart();
+  const { market, money } = useMarket();
+  const notes = [
+    `Complimentary shipping over ${money(market.freeShippingThreshold)}`,
+    "30-day returns, no questions",
+    "Zydane Line ships within 24 hours",
+    "Carbon-neutral delivery on every order",
+  ];
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -87,6 +88,7 @@ export function Header() {
           </Link>
 
           <div className="flex flex-1 items-center justify-end gap-1">
+            <MarketSwitch />
             <button className="p-2.5" onClick={() => setSearch((s) => !s)} aria-label="Search" aria-expanded={search}>
               <SearchIcon />
             </button>

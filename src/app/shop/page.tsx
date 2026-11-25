@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductCard } from "@/components/ProductCard";
 import { getCatalog } from "@/lib/catalog";
+import { getMarket } from "@/lib/market";
 import { categories, type Category, type Source } from "@/lib/products";
 
 export const metadata: Metadata = { title: "Shop" };
@@ -22,7 +23,7 @@ const collections: { id: Source; label: string }[] = [
 
 export default async function Shop({ searchParams }: { searchParams: Promise<Params> }) {
   const sp = await searchParams;
-  const products = await getCatalog();
+  const products = await getCatalog(await getMarket());
   const category = categories.find((c) => c.id === sp.category)?.id as Category | undefined;
   const collection = collections.find((c) => c.id === sp.collection)?.id;
   const sort = sorts.find((s) => s.id === sp.sort)?.id ?? "featured";

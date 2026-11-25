@@ -2,6 +2,7 @@ import "server-only";
 import { getCatalog } from "./catalog";
 import { shippingFor } from "./format";
 import type { Product } from "./products";
+import type { CurrencyCode, Market } from "./site";
 import { createWooOrder, wooEnabled, wooOrderExists } from "./woo";
 
 export interface OrderItemInput {
@@ -26,8 +27,8 @@ export interface Customer {
 }
 
 /** Re-prices a cart from the catalogue. Never trust prices sent by the browser. */
-export async function priceOrder(items: OrderItemInput[]) {
-  const catalog = await getCatalog();
+export async function priceOrder(items: OrderItemInput[], market: Market) {
+  const catalog = await getCatalog(market.code);
   const lines: OrderLine[] = [];
   for (const item of items) {
     const product = catalog.find((p) => p.slug === String(item.slug));
@@ -40,7 +41,7 @@ export async function priceOrder(items: OrderItemInput[]) {
   }
   if (lines.length === 0) return null;
   const subtotal = lines.reduce((n, l) => n + l.product.price * l.qty, 0);
-  const shipping = shippingFor(subtotal);
+  const shipping = shippingFor(subtotal, market);
   return { lines, subtotal, shipping, total: subtotal + shipping };
 }
 
@@ -75,6 +76,7 @@ export async function fulfilViaAliDropship(params: {
   wooLines: string;
   shipping: number;
   paymentTitle: string;
+  currency: CurrencyCode;
 }): Promise<number | null> {
   const lines = decodeWooLines(params.wooLines);
   if (!wooEnabled || lines.length === 0) return null;
@@ -83,6 +85,7 @@ export async function fulfilViaAliDropship(params: {
     reference: params.reference,
     ...params.customer,
     paymentTitle: params.paymentTitle,
+    currency: params.currency,
     lines,
     shipping: params.shipping,
   });

@@ -3,14 +3,15 @@ import { ArrowIcon, LeafIcon, ReturnIcon, ShieldIcon, StarIcon, TruckIcon } from
 import { ProductArt } from "@/components/ProductArt";
 import { ProductCard } from "@/components/ProductCard";
 import { Reveal } from "@/components/Reveal";
-import { money } from "@/lib/format";
-import { getCatalog } from "@/lib/catalog";
-import { categories, getProduct } from "@/lib/products";
-import { site } from "@/lib/site";
+import { formatMoney } from "@/lib/format";
+import { findProduct, getCatalog } from "@/lib/catalog";
+import { getMarket } from "@/lib/market";
+import { categories } from "@/lib/products";
+import { markets } from "@/lib/site";
 
 
-const promises = [
-  { icon: TruckIcon, title: "Fast, tracked delivery", text: `Free over ${money(site.freeShippingThreshold)}. Our own line leaves the warehouse within 24 hours.` },
+const promises = (free: string) => [
+  { icon: TruckIcon, title: "Fast, tracked delivery", text: `Free over ${free}. Our own line leaves the warehouse within 24 hours.` },
   { icon: ReturnIcon, title: "30-day returns", text: "Changed your mind? Send it back within 30 days for a full refund." },
   { icon: ShieldIcon, title: "Vetted, every piece", text: "We test each product ourselves before it earns a place in the shop." },
   { icon: LeafIcon, title: "Made responsibly", text: "Plastic-free packaging and carbon-neutral shipping as standard." },
@@ -22,14 +23,14 @@ const reviews = [
   { quote: "I've bought the tote twice now — once for me and once because my sister kept borrowing mine.", name: "Priya S.", item: "Field Canvas Tote" },
 ];
 
-export const revalidate = 300;
-
 export default async function Home() {
-  const products = await getCatalog();
+  const market = markets[await getMarket()];
+  const money = (n: number) => formatMoney(n, market.currency);
+  const products = await getCatalog(market.code);
   const house = products.filter((p) => p.source === "house");
   const curated = products.filter((p) => p.source === "curated");
-  const hero = getProduct("fairy-potion-kit")!;
-  const story = getProduct("merino-lounge-throw")!;
+  const hero = (await findProduct("fairy-potion-kit", market.code))!;
+  const story = (await findProduct("merino-lounge-throw", market.code))!;
 
   return (
     <>
@@ -178,7 +179,7 @@ export default async function Home() {
       {/* Promise */}
       <section id="promise" className="container-x scroll-mt-24 pt-24">
         <div className="grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-          {promises.map((p) => (
+          {promises(money(market.freeShippingThreshold)).map((p) => (
             <div key={p.title} className="bg-paper p-8">
               <p.icon width={26} height={26} className="text-forest" />
               <h3 className="mt-6 text-[15px] font-medium">{p.title}</h3>

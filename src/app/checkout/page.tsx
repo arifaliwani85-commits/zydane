@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ProductArt } from "@/components/ProductArt";
 import { useCart } from "@/lib/cart";
-import { countries } from "@/lib/countries";
-import { money, shippingFor } from "@/lib/format";
+import { useMarket } from "@/lib/market-client";
 import { fulfilment } from "@/lib/site";
 
 const fields = [
@@ -22,6 +21,7 @@ export default function Checkout() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const { market, money, shippingFor } = useMarket();
   const shipping = shippingFor(subtotal);
   const sources = [...new Set(lines.map((l) => l.product.source))];
 
@@ -78,8 +78,8 @@ export default function Checkout() {
           ))}
           <label className="col-span-2">
             <span className="mb-1.5 block text-xs text-ink-soft">Country</span>
-            <select name="country" required autoComplete="country" defaultValue="US" className="field appearance-none">
-              {countries.map(([code, label]) => (
+            <select key={market.code} name="country" required autoComplete="country" defaultValue={market.countries[0][0]} className="field appearance-none">
+              {market.countries.map(([code, label]) => (
                 <option key={code} value={code}>
                   {label}
                 </option>

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { countries } from "@/lib/countries";
+import { getMarket } from "@/lib/market";
 import { encodeWooLines, priceOrder, routeOrder } from "@/lib/orders";
-import { site } from "@/lib/site";
+import { markets } from "@/lib/site";
 
 const clean = (v: unknown, max = 120) => String(v ?? "").trim().slice(0, max);
 
@@ -13,7 +13,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
-  const order = Array.isArray(body.items) && body.items.length <= 50 ? await priceOrder(body.items) : null;
+  // The market comes from the visitor's saved choice or location, never from the request body.
+  const market = markets[await getMarket()];
+  const order = Array.isArray(body.items) && body.items.length <= 50 ? await priceOrder(body.items, market) : null;
   if (!order) return NextResponse.json({ error: "Your bag is empty or contains an unavailable item." }, { status: 400 });
 
   const c = body.customer ?? {};
@@ -25,8 +27,12 @@ export async function POST(req: Request) {
     postcode: clean(c.postcode, 20),
     country: clean(c.country, 2).toUpperCase(),
   };
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email) || !customer.name || !customer.address || !customer.city || !customer.postcode || !countries.some(([code]) => code === customer.country)) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email) || !customer.name || !customer.address || !customer.city || !customer.postcode) {
     return NextResponse.json({ error: "Please complete your contact and delivery details." }, { status: 400 });
+  }
+
+  if (!market.countries.some(([code]) => code === customer.country)) {
+    return NextResponse.json({ error: `We currently deliver to ${market.countries.map(([, n]) => n).join(", ")} from this store.` }, { status: 400 });
   }
 
   const id = `ZY-${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1296).toString(36).toUpperCase().padStart(2, "0")}`;
@@ -41,6 +47,7 @@ export async function POST(req: Request) {
       demo: true,
       order: {
         id,
+        currency: market.currency,
         email: customer.email,
         subtotal: order.subtotal,
         shipping: order.shipping,
@@ -64,13 +71,14 @@ export async function POST(req: Request) {
     "metadata[postcode]": customer.postcode,
     "metadata[country]": customer.country,
     "metadata[shipping]": order.shipping.toFixed(2),
+    "metadata[currency]": market.currency,
     "metadata[woo_lines]": encodeWooLines(order.lines),
     "metadata[shipments]": JSON.stringify(shipments).slice(0, 500),
   });
   order.lines.forEach((l, i) => {
     const p = `line_items[${i}]`;
     form.set(`${p}[quantity]`, String(l.qty));
-    form.set(`${p}[price_data][currency]`, site.currency.toLowerCase());
+    form.set(`${p}[price_data][currency]`, market.currency.toLowerCase());
     form.set(`${p}[price_data][unit_amount]`, String(Math.round(l.product.price * 100)));
     form.set(`${p}[price_data][product_data][name]`, l.variant ? `${l.product.name} — ${l.variant}` : l.product.name);
   });
@@ -78,7 +86,7 @@ export async function POST(req: Request) {
     form.set("shipping_options[0][shipping_rate_data][type]", "fixed_amount");
     form.set("shipping_options[0][shipping_rate_data][display_name]", "Standard shipping");
     form.set("shipping_options[0][shipping_rate_data][fixed_amount][amount]", String(Math.round(order.shipping * 100)));
-    form.set("shipping_options[0][shipping_rate_data][fixed_amount][currency]", site.currency.toLowerCase());
+    form.set("shipping_options[0][shipping_rate_data][fixed_amount][currency]", market.currency.toLowerCase());
   }
 
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {

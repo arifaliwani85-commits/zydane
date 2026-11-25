@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
-import { money } from "@/lib/format";
+import { useMarket } from "@/lib/market-client";
 import type { Product } from "@/lib/products";
 
 export function AddToCart({ product }: { product: Product }) {
   const { add } = useCart();
+  const { money } = useMarket();
   const [variant, setVariant] = useState(product.variants?.options[0]);
   const [qty, setQty] = useState(1);
 

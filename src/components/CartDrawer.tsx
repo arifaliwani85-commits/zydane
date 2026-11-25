@@ -3,15 +3,15 @@
 import Link from "next/link";
 import { useEffect } from "react";
 import { useCart } from "@/lib/cart";
-import { money, shippingFor } from "@/lib/format";
-import { site } from "@/lib/site";
+import { useMarket } from "@/lib/market-client";
 import { CloseIcon } from "./Icons";
 import { ProductArt } from "./ProductArt";
 
 export function CartDrawer() {
   const { open, setOpen, lines, subtotal, count, setQty, remove } = useCart();
-  const remaining = Math.max(0, site.freeShippingThreshold - subtotal);
-  const progress = Math.min(100, (subtotal / site.freeShippingThreshold) * 100);
+  const { market, money, shippingFor } = useMarket();
+  const remaining = Math.max(0, market.freeShippingThreshold - subtotal);
+  const progress = Math.min(100, (subtotal / market.freeShippingThreshold) * 100);
 
   useEffect(() => {
     if (!open) return;

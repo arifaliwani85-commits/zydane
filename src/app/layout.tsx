@@ -8,7 +8,9 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { CartProvider } from "@/lib/cart";
 import { getCartCatalog } from "@/lib/catalog";
-import { site } from "@/lib/site";
+import { getMarket } from "@/lib/market";
+import { MarketProvider } from "@/lib/market-client";
+import { markets, site } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
@@ -18,10 +20,12 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const catalog = await getCartCatalog();
+  const code = await getMarket();
+  const catalog = await getCartCatalog(code);
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang={markets[code].locale} className={GeistSans.variable}>
       <body>
+        <MarketProvider code={code}>
         <CartProvider catalog={catalog}>
           <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:text-paper">
             Skip to content
@@ -31,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Footer />
           <CartDrawer />
         </CartProvider>
+        </MarketProvider>
       </body>
     </html>
   );

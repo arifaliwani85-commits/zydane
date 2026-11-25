@@ -23,7 +23,8 @@ npm run build && npm start   # production
 
 | What | Where |
 | --- | --- |
-| Store name, currency, shipping fee, free-shipping threshold, support email | `src/lib/site.ts` |
+| Store name, support email | `src/lib/site.ts` |
+| Markets (UK / US): currency, delivery countries, shipping fee, free-shipping limit, exchange rate | `src/lib/site.ts` |
 | Products, prices, variants, suppliers | `src/lib/products.ts` |
 | Colours and fonts | `src/app/globals.css` |
 | Home page copy, reviews and statistics | `src/app/page.tsx` |
@@ -64,3 +65,12 @@ Curated Finds come from **admin.zydane.com**, a WordPress + WooCommerce site run
 - **Products:** import products with AliDropship as usual and publish them. The store picks them up within 5 minutes and shows them in Curated Finds (replacing the sample curated products). Name WooCommerce categories Home, Wellness, Carry, Tech or Kids to place products in the store's categories.
 - **Orders:** when a customer pays with Stripe, the AliDropship items of the order are created as a paid "Processing" order in WooCommerce, where AliDropship places them with the supplier. Demo-mode orders (no Stripe key) are never forwarded.
 - **Settings** (Hostinger → zydane.com → Node.js → Environment variables, then redeploy): `WC_URL`, `WC_KEY`, `WC_SECRET` (a WooCommerce REST API key with Read/Write access) and `STRIPE_WEBHOOK_SECRET`. In Stripe, add the webhook `https://zydane.com/api/stripe/webhook` for `checkout.session.completed`.
+
+## Selling in the UK and the US
+
+Each product has **one listing**. Visitors see prices in the currency of their market, chosen from their saved choice (the flag button in the header), then their country, then their browser language, and otherwise the UK.
+
+- **Prices:** set `prices: { GBP: { price, compareAt }, USD: … }` on a product for exact prices. Without one, the `price` (in US dollars) is converted at the rate in `site.ts` and rounded to .99.
+- **One market only:** add `markets: ["GB"]` to a product (the Face & Neck Massage Set does this). US visitors see a "not available" notice and cannot buy it.
+- **Checkout:** the server decides the market, re-prices the order in that currency and only accepts delivery to that market's country. Stripe is charged in the same currency.
+- **Back office:** prices entered in AliDropship/WooCommerce are read in the currency set in WooCommerce → Settings → General (GBP or USD) and converted for the other market.

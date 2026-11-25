@@ -9,6 +9,8 @@
  * store renders a studio-style illustration from `art` + `tone`.
  */
 
+import type { CurrencyCode, MarketCode } from "./site";
+
 export type Source = "house" | "curated";
 export type Category = "kids" | "home" | "wellness" | "carry" | "tech";
 export type ArtShape =
@@ -27,8 +29,17 @@ export interface Product {
   slug: string;
   name: string;
   subtitle: string;
+  /**
+   * Price in `baseCurrency` (US dollars unless stated). Used for any market
+   * that has no entry in `prices`, converted at the rate set in site.ts.
+   */
   price: number;
   compareAt?: number;
+  baseCurrency?: CurrencyCode;
+  /** Exact prices per currency; these win over the converted `price`. */
+  prices?: Partial<Record<CurrencyCode, { price: number; compareAt?: number }>>;
+  /** Markets this product is sold in. Leave out to sell it in every market. */
+  markets?: MarketCode[];
   category: Category;
   source: Source;
   /** Dropship supplier reference — never shown to shoppers. */
@@ -72,6 +83,7 @@ export const products: Product[] = [
     subtitle: "24-bottle magic potion making kit · Ages 6+",
     price: 22.85,
     compareAt: 25,
+    prices: { GBP: { price: 17.99, compareAt: 19.99 } },
     category: "kids",
     source: "house",
     description:
@@ -130,6 +142,8 @@ export const products: Product[] = [
     name: "Face & Neck Massage Set",
     subtitle: "LED face & neck massager with jade gua sha",
     price: 19.99,
+    prices: { GBP: { price: 14.99 } },
+    markets: ["GB"],
     category: "wellness",
     source: "house",
     description:

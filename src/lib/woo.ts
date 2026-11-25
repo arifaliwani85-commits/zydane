@@ -1,5 +1,6 @@
 import "server-only";
 import type { Category, Product } from "./products";
+import type { CurrencyCode } from "./site";
 
 /**
  * WooCommerce connection for the AliDropship back office (admin.zydane.com).
@@ -97,7 +98,20 @@ const money = (s: string) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-async function toProduct(p: WooProduct): Promise<Product | null> {
+/** The currency prices are entered in on the back office (WooCommerce → Settings → General). */
+async function wooCurrency(): Promise<CurrencyCode> {
+  try {
+    const c = await wc<{ code: string }>("/data/currencies/current");
+    if (c.code === "GBP" || c.code === "USD") return c.code;
+    console.error(`[woo] store currency ${c.code} is not supported; treating prices as USD`);
+  } catch {
+    const fromEnv = process.env.WC_CURRENCY;
+    if (fromEnv === "GBP" || fromEnv === "USD") return fromEnv;
+  }
+  return "USD";
+}
+
+async function toProduct(p: WooProduct, currency: CurrencyCode): Promise<Product | null> {
   const price = money(p.price);
   if (!price) return null;
   const regular = money(p.regular_price);
@@ -127,6 +141,7 @@ async function toProduct(p: WooProduct): Promise<Product | null> {
     name: decode(p.name),
     subtitle: decode(p.categories[0]?.name ?? "Curated find"),
     price,
+    baseCurrency: currency,
     compareAt: regular > price ? regular : undefined,
     category: categoryOf(p),
     source: "curated",
@@ -155,7 +170,8 @@ export async function fetchWooProducts(): Promise<Product[] | null> {
       all.push(...batch);
       if (batch.length < 100) break;
     }
-    const products = await Promise.all(all.map(toProduct));
+    const currency = await wooCurrency();
+    const products = await Promise.all(all.map((p) => toProduct(p, currency)));
     return products.filter((p): p is Product => p !== null);
   } catch (err) {
     console.error("[woo] could not load products:", err instanceof Error ? err.message : err);
@@ -172,6 +188,7 @@ export interface WooOrderInput {
   postcode: string;
   country: string;
   paymentTitle: string;
+  currency: CurrencyCode;
   lines: { wooId: number; variationId?: number; variant?: string; qty: number; price: number }[];
   shipping: number;
 }
@@ -195,6 +212,7 @@ export async function createWooOrder(o: WooOrderInput): Promise<number> {
     revalidate: false,
     body: JSON.stringify({
       status: "processing",
+      currency: o.currency,
       set_paid: true,
       payment_method: "zydane",
       payment_method_title: o.paymentTitle,

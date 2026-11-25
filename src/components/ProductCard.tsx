@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useCart } from "@/lib/cart";
-import { money } from "@/lib/format";
+import { useMarket } from "@/lib/market-client";
 import type { Product } from "@/lib/products";
 import { fulfilment } from "@/lib/site";
 import { ProductArt } from "./ProductArt";
 
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
+  const { money } = useMarket();
   const quickAdd = !product.variants;
 
   return (

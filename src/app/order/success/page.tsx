@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CheckIcon } from "@/components/Icons";
 import { useCart } from "@/lib/cart";
-import { money } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
+import type { CurrencyCode } from "@/lib/site";
 
 interface Order {
   id: string;
+  currency: CurrencyCode;
   email: string;
   subtotal: number;
   shipping: number;
@@ -28,6 +30,8 @@ export default function OrderSuccess() {
       /* ignore */
     }
   }, [clear]);
+
+  const money = (n: number) => formatMoney(n, order?.currency ?? "GBP");
 
   return (
     <section className="container-x flex flex-col items-center py-20 text-center lg:py-28">

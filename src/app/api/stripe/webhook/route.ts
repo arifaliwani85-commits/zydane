@@ -56,6 +56,7 @@ export async function POST(req: Request) {
       wooLines: m.woo_lines ?? "",
       shipping: Number(m.shipping ?? 0),
       paymentTitle: "Card (Stripe)",
+      currency: m.currency === "USD" ? "USD" : "GBP",
     });
     if (wooId) console.info("[aliDropship] order", m.order_id, "→ WooCommerce", wooId);
   } catch (err) {
