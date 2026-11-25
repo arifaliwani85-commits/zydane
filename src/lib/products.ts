@@ -10,7 +10,7 @@
  */
 
 export type Source = "house" | "curated";
-export type Category = "home" | "wellness" | "carry" | "tech";
+export type Category = "kids" | "home" | "wellness" | "carry" | "tech";
 export type ArtShape =
   | "bottle"
   | "jar"
@@ -36,17 +36,24 @@ export interface Product {
   description: string;
   details: string[];
   variants?: { label: string; options: string[] };
-  rating: number;
-  reviews: number;
+  /** Leave out until you have real reviews; the stars are hidden without them. */
+  rating?: number;
+  reviews?: number;
   badge?: string;
   art: ArtShape;
   /** [backdrop, object] colours for the generated product visual. */
   tone: [string, string];
   image?: string;
+  /** Extra photos shown in the product page gallery (the first is `image`). */
+  gallery?: string[];
+  /** Feature blocks shown on the product page. */
+  highlights?: { title: string; text: string }[];
+  safety?: string;
   featured?: boolean;
 }
 
 export const categories: { id: Category; name: string; blurb: string }[] = [
+  { id: "kids", name: "Kids", blurb: "Play that sparks imagination" },
   { id: "home", name: "Home", blurb: "Objects that settle a room" },
   { id: "wellness", name: "Wellness", blurb: "Small rituals, done well" },
   { id: "carry", name: "Carry", blurb: "Made to leave the house" },
@@ -55,6 +62,65 @@ export const categories: { id: Category; name: string; blurb: string }[] = [
 
 export const products: Product[] = [
   // ───────────── Zydane Line (private label) ─────────────
+  {
+    slug: "fairy-potion-kit",
+    name: "Fairy Potion Kit",
+    subtitle: "24-bottle magic potion making kit · Ages 6+",
+    price: 22.85,
+    compareAt: 25,
+    category: "kids",
+    source: "house",
+    description:
+      "Spark your child's imagination with the Zydane Fairy Potion Kit. This 24-bottle craft set lets kids mix their own enchanting potions using colorful magic powders, glitter, sequins, crystals and glow-in-the-dark stones. It blends creative arts with hands-on STEM play: children measure, mix and watch colors combine while inventing stories about fairies, wizards and magical creatures. The reusable corked bottles, funnels, mixing bowls and stirring rods mean kids can play again and again, and the included display case shows off their favorite creations.",
+    details: [
+      "24 reusable corked bottles and a display case",
+      "7 magic powders, glitter, sequins and crystals",
+      "Glow-in-the-dark stones, fairy wings and charms",
+      "2 funnels, 2 mixing bowls, stirring rods and labels",
+      "Non-toxic, EN71-tested materials",
+      "For ages 6 and up, with adult supervision",
+      "Box: 9.25 × 6.69 × 2.36 in, 1.21 lb",
+    ],
+    highlights: [
+      {
+        title: "A magical potion-making adventure",
+        text: "Kids become real potion masters, brewing Friendship Elixir, Dream Dust, Unicorn Wishes and Rainbow Magic. Every mix sparks imagination, storytelling and hours of screen-free play.",
+      },
+      {
+        title: "Easy step-by-step instructions",
+        text: "Mix, create, decorate and display. The instruction guide gets kids brewing straight out of the box, with room to invent their own spells — and minimal mess for parents.",
+      },
+      {
+        title: "Everything included, 24 bottles",
+        text: "Reusable corked bottles, 7 magic powders, glitter, sequins, crystals, glow-in-the-dark stones, fairy wings, charms, funnels, mixing bowls, stirring rods, labels and a display case.",
+      },
+      {
+        title: "STEM learning through play",
+        text: "Kids practise measuring, mixing and observing color changes while building fine motor skills, focus and problem-solving — at home, in classrooms, at parties and sleepovers.",
+      },
+      {
+        title: "The perfect gift for girls & boys",
+        text: "A gift-ready box for birthdays, Christmas, Halloween or just because. Reusable bottles and tools mean kids come back to it again and again.",
+      },
+    ],
+    safety:
+      "Not suitable for children under 6 years. To be used under the direct supervision of an adult. Choking hazard: contains small parts. Includes a long cord; ensure proper use to prevent entanglement. If prone to asthma or allergies, use in a ventilated space.",
+    badge: "Ages 6+",
+    art: "jar",
+    tone: ["#2A1B4D", "#8E5BD8"],
+    image: "/products/potion-kit/6.jpg",
+    gallery: [
+      "/products/potion-kit/1.jpg",
+      "/products/potion-kit/2.jpg",
+      "/products/potion-kit/3.jpg",
+      "/products/potion-kit/5.jpg",
+      "/products/potion-kit/9.jpg",
+      "/products/potion-kit/8.jpg",
+      "/products/potion-kit/7.jpg",
+      "/products/potion-kit/4.jpg",
+    ],
+    featured: true,
+  },
   {
     slug: "atlas-ceramic-mug",
     name: "Atlas Ceramic Mug",

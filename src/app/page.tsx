@@ -24,8 +24,7 @@ const reviews = [
 ];
 
 export default function Home() {
-  const hero = getProduct("no-1-botanical-candle")!;
-  const heroAlt = getProduct("atlas-ceramic-mug")!;
+  const hero = getProduct("fairy-potion-kit")!;
   const story = getProduct("merino-lounge-throw")!;
 
   return (
@@ -58,30 +57,40 @@ export default function Home() {
         </div>
 
         <div className="rise relative" style={{ animationDelay: "200ms" }}>
-          <Link href={`/product/${hero.slug}`} className="group block aspect-[4/5] overflow-hidden rounded-[28px] bg-shell">
-            <div className="h-full transition-transform duration-[1600ms] ease-out-soft group-hover:scale-[1.04]">
-              <ProductArt product={hero} />
-            </div>
+          <Link href={`/product/${hero.slug}`} className="group block aspect-[4/5] overflow-hidden rounded-[28px] bg-[#1b1233]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={hero.image}
+              alt={`${hero.name}: glowing potion bottles beside the Zydane Potion Set box`}
+              fetchPriority="high"
+              className="h-full w-full object-cover transition-transform duration-[1600ms] ease-out-soft group-hover:scale-[1.04]"
+            />
           </Link>
           <Link
-            href={`/product/${heroAlt.slug}`}
+            href={`/product/${hero.slug}`}
             className="absolute -bottom-6 -left-4 hidden w-44 rounded-2xl bg-paper p-2.5 shadow-[0_24px_60px_-20px_rgba(22,21,18,0.35)] transition-transform duration-500 hover:-translate-y-1 sm:block lg:-left-12"
           >
-            <div className="aspect-square overflow-hidden rounded-xl"><ProductArt product={heroAlt} /></div>
-            <p className="px-1.5 pt-3 text-[13px] font-medium">{heroAlt.name}</p>
-            <p className="px-1.5 pb-1.5 text-[13px] text-ink-soft">{money(heroAlt.price)}</p>
+            <div className="aspect-square overflow-hidden rounded-xl bg-white">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={hero.gallery![0]} alt="Everything included in the Fairy Potion Kit" className="h-full w-full object-cover" />
+            </div>
+            <p className="px-1.5 pt-3 text-[13px] font-medium">24 bottles, all included</p>
+            <p className="px-1.5 pb-1.5 text-[13px] text-ink-soft">Shop the kit</p>
           </Link>
-          <div className="absolute right-4 top-4 rounded-full bg-paper/90 px-4 py-2 text-xs backdrop-blur">
+          <Link
+            href={`/product/${hero.slug}`}
+            className="absolute right-4 top-4 rounded-full bg-paper/90 px-4 py-2 text-xs backdrop-blur transition-colors hover:bg-paper"
+          >
             <span className="font-medium">{hero.name}</span> · {money(hero.price)}
-          </div>
+          </Link>
         </div>
       </section>
 
       {/* Categories */}
       <section className="container-x py-14">
-        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line lg:grid-cols-5">
           {categories.map((c, i) => (
-            <Link key={c.id} href={`/shop?category=${c.id}`} className="group flex min-h-44 flex-col justify-between bg-paper p-6 transition-colors duration-500 hover:bg-shell sm:p-8">
+            <Link key={c.id} href={`/shop?category=${c.id}`} className={`group flex min-h-44 flex-col justify-between bg-paper p-6 transition-colors duration-500 hover:bg-shell sm:p-8 ${i === 0 ? "max-lg:col-span-2" : ""}`}>
               <span className="eyebrow">0{i + 1}</span>
               <span>
                 <span className="display flex items-center justify-between text-4xl sm:text-5xl">

@@ -53,6 +53,6 @@ The catalogue, reviews, ratings and customer statistics are **sample content**. 
 
 ## Hosting
 
-The store is deployed to Hostinger at **https://shop.zydane.com** and redeploys automatically on every push to the deployed branch.
+The store is deployed to Hostinger at **https://zydane.com** (and a copy at shop.zydane.com) and redeploys automatically on every push to the deployed branch.
 
 The build uses webpack (`next build --webpack`) and a JavaScript config file, because Hostinger's build servers have an older system library (glibc) than Next.js's default compiler needs. Keep both when changing the build setup.

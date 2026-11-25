@@ -40,7 +40,7 @@ export default async function Shop({ searchParams }: { searchParams: Promise<Par
   );
   if (sort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
   else if (sort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
-  else if (sort === "rating") list = [...list].sort((a, b) => b.rating - a.rating || b.reviews - a.reviews);
+  else if (sort === "rating") list = [...list].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviews ?? 0) - (a.reviews ?? 0));
   else list = [...list].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
 
   const title = q
