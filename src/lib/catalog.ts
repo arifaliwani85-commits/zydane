@@ -5,7 +5,7 @@ import { exchangeRates, markets, type CurrencyCode, type MarketCode } from "./si
 import { fetchWooProducts } from "./woo";
 
 /** A product with its price worked out for one market. */
-export type MarketProduct = Product & { available: boolean; comingSoon: boolean };
+export type MarketProduct = Product & { available: boolean; comingSoon: boolean; hidden: boolean };
 
 /** Converts between currencies and rounds to a friendly price ending in .99. */
 export function convert(amount: number, from: CurrencyCode, to: CurrencyCode) {
@@ -27,6 +27,7 @@ function forMarket(p: Product, code: MarketCode): MarketProduct {
     baseCurrency: currency,
     available: !p.markets || p.markets.includes(code),
     comingSoon: Boolean(p.sample),
+    hidden: Boolean(p.hidden),
   };
 }
 
@@ -42,14 +43,14 @@ const getAll = cache(async (code: MarketCode): Promise<MarketProduct[]> => {
   return [...house, ...curated].map((p) => forMarket(p, code));
 });
 
-/** The products shown to a visitor in this market, including any marked "Coming soon". */
+/** The products listed for a visitor in this market, including any marked "Coming soon". Hidden items are left out. */
 export async function getCatalog(code: MarketCode): Promise<MarketProduct[]> {
-  return (await getAll(code)).filter((p) => p.available);
+  return (await getAll(code)).filter((p) => p.available && !p.hidden);
 }
 
-/** Only the products a visitor in this market can actually buy. */
+/** Every product a visitor in this market can actually buy, including hidden ones reached by link. */
 export async function getBuyable(code: MarketCode): Promise<MarketProduct[]> {
-  return (await getCatalog(code)).filter((p) => !p.comingSoon);
+  return (await getAll(code)).filter((p) => p.available && !p.comingSoon);
 }
 
 /** One product for a market, including ones not sold there (check `available`). */

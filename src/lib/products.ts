@@ -63,6 +63,8 @@ export interface Product {
   featured?: boolean;
   /** Placeholder product shown as "Coming soon" and not buyable. Remove it or its flag once the product is real. */
   sample?: boolean;
+  /** Not listed in the shop or on the home page; only reachable by its exact link. Used for payment tests. */
+  hidden?: boolean;
   /** WooCommerce product id, for Curated Finds synced from the AliDropship back office. */
   wooId?: number;
   /** WooCommerce variation id for each option of a synced product. */
@@ -491,6 +493,22 @@ export const products: Product[] = [
     reviews: 276,
     art: "flask",
     tone: ["#E0E4DE", "#9DAA98"],
+  },
+  // TEMPORARY: a £1 item for testing real payments. Delete this entry after testing.
+  {
+    slug: "payment-test-7k2q",
+    hidden: true,
+    name: "Zydane payment test",
+    subtitle: "Internal test item. Nothing will be shipped.",
+    price: 1.3,
+    prices: { GBP: { price: 1 } },
+    markets: ["GB"],
+    category: "home",
+    source: "house",
+    description: "An internal item used to test card payments. It is not for sale and nothing will be shipped.",
+    details: ["Internal payment test", "Nothing will be shipped"],
+    art: "jar",
+    tone: ["#E8E2D8", "#8A7A62"],
   },
 ];
 
