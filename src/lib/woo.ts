@@ -82,12 +82,20 @@ const plain = (html: string) =>
     .replace(/\n\s*\n+/g, "\n")
     .trim();
 
-const categoryIds: Category[] = ["kids", "home", "wellness", "carry", "tech"];
+/** Words in a WooCommerce category name or slug that place a product in each store section. */
+const categoryWords: Record<Category, string[]> = {
+  kids: ["kid", "toy", "child", "baby", "game", "puzzle", "craft", "play", "block", "doll", "plush", "educational", "stem", "model", "figure"],
+  wellness: ["wellness", "beauty", "health", "massage", "skin", "care"],
+  carry: ["carry", "bag", "travel", "watch", "bottle", "flask"],
+  tech: ["tech", "gadget", "electronic", "phone", "audio", "charger"],
+  home: ["home", "kitchen", "decor", "garden", "furniture", "light"],
+};
 
-/** Maps a WooCommerce category named Home / Wellness / Carry / Tech / Kids to the store's own. */
+/** Maps a WooCommerce category to one of the store's sections. Unmatched products go to Home. */
 function categoryOf(p: WooProduct): Category {
   for (const c of p.categories) {
-    const hit = categoryIds.find((id) => c.slug.toLowerCase().includes(id) || c.name.toLowerCase().includes(id));
+    const text = `${c.slug} ${c.name}`.toLowerCase();
+    const hit = (Object.keys(categoryWords) as Category[]).find((id) => categoryWords[id].some((w) => text.includes(w)));
     if (hit) return hit;
   }
   return "home";
