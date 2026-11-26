@@ -34,7 +34,9 @@ export function Footer() {
             <ul className="mt-5 space-y-3">
               <li><Link className="link-underline" href="/#promise">Shipping &amp; returns</Link></li>
               <li><Link className="link-underline" href="/#story">Our story</Link></li>
-              <li><a className="link-underline" href={`mailto:${site.supportEmail}`}>Contact us</a></li>
+              <li><a className="link-underline" href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a></li>
+              <li><a className="link-underline" href={`mailto:${site.altEmail}`}>{site.altEmail}</a></li>
+              <li><a className="link-underline" href={`tel:${site.phoneHref}`}>{site.phone}</a></li>
             </ul>
           </div>
         </div>

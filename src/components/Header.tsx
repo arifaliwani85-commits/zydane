@@ -150,7 +150,11 @@ export function Header() {
               </Link>
             ))}
           </nav>
-          <p className="mt-auto text-sm text-ink-soft">{site.supportEmail}</p>
+          <div className="mt-auto space-y-1 text-sm text-ink-soft">
+            <p><a href={`mailto:${site.supportEmail}`}>{site.supportEmail}</a></p>
+            <p><a href={`mailto:${site.altEmail}`}>{site.altEmail}</a></p>
+            <p><a href={`tel:${site.phoneHref}`}>{site.phone}</a></p>
+          </div>
         </div>
       </div>
     </>

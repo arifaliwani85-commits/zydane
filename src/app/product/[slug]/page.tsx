@@ -163,7 +163,7 @@ export default async function ProductPage({ params }: Props) {
               </summary>
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
                 {f.shipping}. {f.delivery}, with tracking sent by email. If it isn&apos;t right, return it within 30 days
-                for a full refund — email {site.supportEmail} and we&apos;ll arrange it.
+                for a full refund — email {site.supportEmail} or call {site.phone} and we&apos;ll arrange it.
               </p>
             </details>
           </div>

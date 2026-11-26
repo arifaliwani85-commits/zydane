@@ -46,7 +46,13 @@ export const site = {
   tagline: "Considered essentials for everyday living",
   description:
     "Zydane designs its own line of everyday essentials and curates the best finds from independent makers worldwide.",
-  supportEmail: "hello@zydane.com",
+  /** Main customer email, shown on the site and in returns instructions. */
+  supportEmail: "info@zydane.com",
+  /** Second contact address, shown in the footer and menu. */
+  altEmail: "zydaneltd@gmail.com",
+  /** Phone number as shown to customers, and in dialling form. */
+  phone: "+44 7377 777614",
+  phoneHref: "+447377777614",
 } as const;
 
 export const fulfilment = {
