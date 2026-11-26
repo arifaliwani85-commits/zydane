@@ -1,5 +1,5 @@
 import "server-only";
-import { getCatalog } from "./catalog";
+import { getBuyable } from "./catalog";
 import type { Product } from "./products";
 import type { CurrencyCode, Market } from "./site";
 import { createWooOrder, wooEnabled, wooOrderExists } from "./woo";
@@ -28,7 +28,7 @@ export interface Customer {
 
 /** Re-prices a cart from the catalogue. Never trust prices sent by the browser. */
 export async function priceOrder(items: OrderItemInput[], market: Market) {
-  const catalog = await getCatalog(market.code);
+  const catalog = await getBuyable(market.code);
   const lines: OrderLine[] = [];
   for (const item of items) {
     const product = catalog.find((p) => p.slug === String(item.slug));

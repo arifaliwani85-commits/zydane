@@ -61,6 +61,8 @@ export interface Product {
   highlights?: { title: string; text: string }[];
   safety?: string;
   featured?: boolean;
+  /** Placeholder product shown as "Coming soon" and not buyable. Remove it or its flag once the product is real. */
+  sample?: boolean;
   /** WooCommerce product id, for Curated Finds synced from the AliDropship back office. */
   wooId?: number;
   /** WooCommerce variation id for each option of a synced product. */
@@ -202,6 +204,7 @@ export const products: Product[] = [
   },
   {
     slug: "atlas-ceramic-mug",
+    sample: true,
     name: "Atlas Ceramic Mug",
     subtitle: "Hand-glazed stoneware, 350 ml",
     price: 28,
@@ -220,6 +223,7 @@ export const products: Product[] = [
   },
   {
     slug: "no-1-botanical-candle",
+    sample: true,
     name: "No. 1 Botanical Candle",
     subtitle: "Fig leaf, cedar & black tea",
     price: 42,
@@ -236,6 +240,7 @@ export const products: Product[] = [
   },
   {
     slug: "daily-renewal-serum",
+    sample: true,
     name: "Daily Renewal Serum",
     subtitle: "Niacinamide 5% + squalane",
     price: 38,
@@ -254,6 +259,7 @@ export const products: Product[] = [
   },
   {
     slug: "mineral-bath-soak",
+    sample: true,
     name: "Mineral Bath Soak",
     subtitle: "Magnesium, eucalyptus & clary sage",
     price: 32,
@@ -269,6 +275,7 @@ export const products: Product[] = [
   },
   {
     slug: "field-canvas-tote",
+    sample: true,
     name: "Field Canvas Tote",
     subtitle: "18 oz waxed cotton, leather handles",
     price: 68,
@@ -287,6 +294,7 @@ export const products: Product[] = [
   },
   {
     slug: "insulated-steel-flask",
+    sample: true,
     name: "Insulated Steel Flask",
     subtitle: "Cold 24 h, hot 12 h — 600 ml",
     price: 36,
@@ -303,6 +311,7 @@ export const products: Product[] = [
   },
   {
     slug: "merino-lounge-throw",
+    sample: true,
     name: "Merino Lounge Throw",
     subtitle: "Extra-fine merino, 130 × 180 cm",
     price: 124,
@@ -319,6 +328,7 @@ export const products: Product[] = [
   },
   {
     slug: "hand-and-body-wash",
+    sample: true,
     name: "Hand & Body Wash",
     subtitle: "Bergamot, vetiver & sea salt",
     price: 24,
@@ -336,6 +346,7 @@ export const products: Product[] = [
   // ───────────── Curated Finds (dropship) ─────────────
   {
     slug: "halo-table-lamp",
+    sample: true,
     name: "Halo Table Lamp",
     subtitle: "Dimmable, cordless, 40 h battery",
     price: 89,
@@ -356,6 +367,7 @@ export const products: Product[] = [
   },
   {
     slug: "orbit-wireless-speaker",
+    sample: true,
     name: "Orbit Wireless Speaker",
     subtitle: "360° sound, 20 h playtime",
     price: 119,
@@ -374,6 +386,7 @@ export const products: Product[] = [
   },
   {
     slug: "meridian-field-watch",
+    sample: true,
     name: "Meridian Field Watch",
     subtitle: "38 mm, sapphire crystal",
     price: 165,
@@ -393,6 +406,7 @@ export const products: Product[] = [
   },
   {
     slug: "pour-over-carafe-set",
+    sample: true,
     name: "Pour-Over Carafe Set",
     subtitle: "Borosilicate glass, serves four",
     price: 54,
@@ -409,6 +423,7 @@ export const products: Product[] = [
   },
   {
     slug: "aroma-stone-diffuser",
+    sample: true,
     name: "Aroma Stone Diffuser",
     subtitle: "Ultrasonic, ceramic shell",
     price: 64,
@@ -425,6 +440,7 @@ export const products: Product[] = [
   },
   {
     slug: "magnetic-charging-stand",
+    sample: true,
     name: "Magnetic Charging Stand",
     subtitle: "15 W wireless, solid walnut",
     price: 58,
@@ -442,6 +458,7 @@ export const products: Product[] = [
   },
   {
     slug: "travel-tech-pouch",
+    sample: true,
     name: "Travel Tech Pouch",
     subtitle: "Recycled nylon, lay-flat design",
     price: 39,
@@ -459,6 +476,7 @@ export const products: Product[] = [
   },
   {
     slug: "glass-water-bottle",
+    sample: true,
     name: "Glass Water Bottle",
     subtitle: "Borosilicate with silicone sleeve",
     price: 29,

@@ -5,7 +5,7 @@ import { exchangeRates, markets, type CurrencyCode, type MarketCode } from "./si
 import { fetchWooProducts } from "./woo";
 
 /** A product with its price worked out for one market. */
-export type MarketProduct = Product & { available: boolean };
+export type MarketProduct = Product & { available: boolean; comingSoon: boolean };
 
 /** Converts between currencies and rounds to a friendly price ending in .99. */
 export function convert(amount: number, from: CurrencyCode, to: CurrencyCode) {
@@ -26,6 +26,7 @@ function forMarket(p: Product, code: MarketCode): MarketProduct {
     compareAt: compareAt && compareAt > price ? compareAt : undefined,
     baseCurrency: currency,
     available: !p.markets || p.markets.includes(code),
+    comingSoon: Boolean(p.sample),
   };
 }
 
@@ -41,9 +42,14 @@ const getAll = cache(async (code: MarketCode): Promise<MarketProduct[]> => {
   return [...house, ...curated].map((p) => forMarket(p, code));
 });
 
-/** The products a visitor in this market can buy. */
+/** The products shown to a visitor in this market, including any marked "Coming soon". */
 export async function getCatalog(code: MarketCode): Promise<MarketProduct[]> {
   return (await getAll(code)).filter((p) => p.available);
+}
+
+/** Only the products a visitor in this market can actually buy. */
+export async function getBuyable(code: MarketCode): Promise<MarketProduct[]> {
+  return (await getCatalog(code)).filter((p) => !p.comingSoon);
 }
 
 /** One product for a market, including ones not sold there (check `available`). */
@@ -58,7 +64,7 @@ export type CartProduct = Pick<
 >;
 
 export async function getCartCatalog(code: MarketCode): Promise<CartProduct[]> {
-  return (await getCatalog(code)).map(({ slug, name, subtitle, price, source, variants, image, art, tone }) => ({
+  return (await getBuyable(code)).map(({ slug, name, subtitle, price, source, variants, image, art, tone }) => ({
     slug,
     name,
     subtitle,

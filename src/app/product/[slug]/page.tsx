@@ -41,7 +41,7 @@ export default async function ProductPage({ params }: Props) {
     description: product.description,
     brand: { "@type": "Brand", name: site.name },
     ...(product.image ? { image: [product.image, ...(product.gallery ?? [])] } : {}),
-    ...(product.available
+    ...(product.available && !product.comingSoon
       ? { offers: { "@type": "Offer", price: product.price, priceCurrency: market.currency, availability: "https://schema.org/InStock" } }
       : {}),
   };
@@ -82,7 +82,7 @@ export default async function ProductPage({ params }: Props) {
           <h1 className="display mt-4 text-5xl sm:text-6xl">{product.name}</h1>
           <p className="mt-3 text-ink-soft">{product.subtitle}</p>
 
-          {product.rating && product.reviews ? (
+          {!product.comingSoon && product.rating && product.reviews ? (
           <div className="mt-5 flex items-center gap-2 text-sm">
             <span className="flex text-bronze" aria-hidden>
               {Array.from({ length: 5 }).map((_, i) => (
@@ -94,7 +94,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
           ) : null}
 
-          {product.available && (
+          {product.available && !product.comingSoon && (
             <p className="mt-7 flex items-baseline gap-3">
               <span className="display text-5xl tabular-nums">{money(product.price)}</span>
               {product.compareAt && <s className="text-lg text-ink-faint">{money(product.compareAt)}</s>}
@@ -103,7 +103,17 @@ export default async function ProductPage({ params }: Props) {
 
           <p className="mt-7 leading-relaxed text-ink-soft">{product.description}</p>
 
-          {product.available ? (
+          {product.comingSoon ? (
+            <div className="mt-9 rounded-2xl border border-line p-6" role="status">
+              <p className="text-[15px] font-medium">Coming soon</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                This product isn&apos;t available to order yet. Browse what you can buy today.
+              </p>
+              <Link href="/shop" className="btn btn-outline mt-5">
+                Browse what&apos;s available
+              </Link>
+            </div>
+          ) : product.available ? (
             <div className="mt-9">
               <AddToCart product={product} />
             </div>
@@ -121,7 +131,7 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
 
-          {product.available && (
+          {product.available && !product.comingSoon && (
           <ul className="mt-8 space-y-3 rounded-2xl bg-shell p-6 text-sm">
             <li className="flex gap-3"><TruckIcon className="mt-0.5 shrink-0 text-forest" /><span><span className="font-medium">{f.shipping}.</span> {f.delivery}.</span></li>
             <li className="flex gap-3"><ReturnIcon className="mt-0.5 shrink-0 text-forest" /><span>30-day returns and free shipping on every order.</span></li>

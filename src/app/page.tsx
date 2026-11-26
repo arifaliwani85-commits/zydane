@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowIcon, LeafIcon, ReturnIcon, ShieldIcon, StarIcon, TruckIcon } from "@/components/Icons";
+import { ArrowIcon, CheckIcon, ReturnIcon, ShieldIcon, TruckIcon } from "@/components/Icons";
 import { ProductArt } from "@/components/ProductArt";
 import { ProductCard } from "@/components/ProductCard";
 import { Reveal } from "@/components/Reveal";
@@ -13,22 +13,17 @@ import { markets } from "@/lib/site";
 const promises = [
   { icon: TruckIcon, title: "Fast, tracked delivery", text: "Free shipping on every order. Our own line leaves the warehouse within 24 hours." },
   { icon: ReturnIcon, title: "30-day returns", text: "Changed your mind? Send it back within 30 days for a full refund." },
-  { icon: ShieldIcon, title: "Vetted, every piece", text: "We test each product ourselves before it earns a place in the shop." },
-  { icon: LeafIcon, title: "Made responsibly", text: "Plastic-free packaging and carbon-neutral shipping as standard." },
+  { icon: ShieldIcon, title: "Secure checkout", text: "Pay by card or PayPal. Payments are processed by Stripe and PayPal, and we never see your card details." },
+  { icon: CheckIcon, title: "UK and US delivery", text: "We deliver to addresses in the United Kingdom and the United States." },
 ];
 
-const reviews = [
-  { quote: "The mug is the first thing I reach for every morning. It feels like it cost three times as much.", name: "Hannah R.", item: "Atlas Ceramic Mug" },
-  { quote: "Beautifully packed, arrived in two days, and the candle scent is unlike anything else I own.", name: "Daniel O.", item: "No. 1 Botanical Candle" },
-  { quote: "I've bought the tote twice now — once for me and once because my sister kept borrowing mine.", name: "Priya S.", item: "Field Canvas Tote" },
-];
 
 export default async function Home() {
   const market = markets[await getMarket()];
   const money = (n: number) => formatMoney(n, market.currency);
   const products = await getCatalog(market.code);
-  const house = products.filter((p) => p.source === "house");
-  const curated = products.filter((p) => p.source === "curated");
+  const house = products.filter((p) => p.source === "house").sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon));
+  const curated = products.filter((p) => p.source === "curated").sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon));
   const hero = (await findProduct("fairy-potion-kit", market.code))!;
   const story = (await findProduct("merino-lounge-throw", market.code))!;
 
@@ -52,12 +47,6 @@ export default async function Home() {
             <Link href="/shop?collection=curated" className="btn btn-outline">
               Explore Curated Finds
             </Link>
-          </div>
-          <div className="rise mt-12 flex items-center gap-3 text-sm text-ink-soft" style={{ animationDelay: "380ms" }}>
-            <span className="flex text-bronze" aria-hidden>
-              {Array.from({ length: 5 }).map((_, i) => <StarIcon key={i} />)}
-            </span>
-            <span><span className="font-medium text-ink">4.8 out of 5</span> from 4,500+ verified reviews</span>
           </div>
         </div>
 
@@ -145,7 +134,7 @@ export default async function Home() {
               to you directly.
             </p>
             <dl className="mt-10 grid max-w-md grid-cols-3 gap-6 border-t border-cream/15 pt-8">
-              {[["40k+", "Happy customers"], ["24 h", "Dispatch on our line"], ["30 days", "Free returns"]].map(([n, l]) => (
+              {[["24 h", "Dispatch on our line"], ["30 days", "To change your mind"], ["Free", "Shipping on every order"]].map(([n, l]) => (
                 <div key={l}>
                   <dt className="display text-4xl">{n}</dt>
                   <dd className="mt-1 text-xs text-cream/55">{l}</dd>
@@ -185,30 +174,6 @@ export default async function Home() {
               <h3 className="mt-6 text-[15px] font-medium">{p.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">{p.text}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Reviews */}
-      <section className="container-x pt-24">
-        <Reveal>
-          <p className="eyebrow">In their words</p>
-          <h2 className="display mt-4 text-5xl sm:text-6xl">Kept, used, loved.</h2>
-        </Reveal>
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
-          {reviews.map((r, i) => (
-            <Reveal key={r.name} delay={i * 90}>
-              <figure className="flex h-full flex-col rounded-3xl bg-shell p-8">
-                <span className="flex text-bronze" aria-label="5 out of 5 stars">
-                  {Array.from({ length: 5 }).map((_, s) => <StarIcon key={s} />)}
-                </span>
-                <blockquote className="display mt-6 flex-1 text-[28px] leading-[1.15]">“{r.quote}”</blockquote>
-                <figcaption className="mt-8 text-sm">
-                  <span className="font-medium">{r.name}</span>
-                  <span className="text-ink-soft"> · Verified buyer of {r.item}</span>
-                </figcaption>
-              </figure>
-            </Reveal>
           ))}
         </div>
       </section>

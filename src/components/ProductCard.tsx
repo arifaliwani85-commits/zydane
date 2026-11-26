@@ -7,10 +7,11 @@ import type { Product } from "@/lib/products";
 import { fulfilment } from "@/lib/site";
 import { ProductArt } from "./ProductArt";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: Product & { comingSoon?: boolean } }) {
   const { add } = useCart();
   const { money } = useMarket();
   const quickAdd = !product.variants;
+  const soon = Boolean(product.comingSoon);
 
   return (
     <article className="group relative">
@@ -20,12 +21,12 @@ export function ProductCard({ product }: { product: Product }) {
             <ProductArt product={product} />
           </div>
         </Link>
-        {product.badge && (
+        {(soon || product.badge) && (
           <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-paper/90 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.14em] backdrop-blur">
-            {product.badge}
+            {soon ? "Coming soon" : product.badge}
           </span>
         )}
-        <div className="absolute inset-x-3 bottom-3 translate-y-2 opacity-0 transition-all duration-500 ease-out-soft group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 max-md:hidden">
+        <div hidden={soon} className="absolute inset-x-3 bottom-3 translate-y-2 opacity-0 transition-all duration-500 ease-out-soft group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 max-md:hidden">
           {quickAdd ? (
             <button
               onClick={() => add(product.slug)}
@@ -53,10 +54,14 @@ export function ProductCard({ product }: { product: Product }) {
           </h3>
           <p className="mt-0.5 truncate text-[13px] text-ink-soft">{product.subtitle}</p>
         </div>
-        <p className="shrink-0 pt-[22px] text-right text-[15px] tabular-nums">
-          {product.compareAt && <s className="mr-1.5 text-[13px] text-ink-faint">{money(product.compareAt)}</s>}
-          {money(product.price)}
-        </p>
+        {soon ? (
+          <p className="shrink-0 pt-[22px] text-right text-[13px] text-ink-faint">Coming soon</p>
+        ) : (
+          <p className="shrink-0 pt-[22px] text-right text-[15px] tabular-nums">
+            {product.compareAt && <s className="mr-1.5 text-[13px] text-ink-faint">{money(product.compareAt)}</s>}
+            {money(product.price)}
+          </p>
+        )}
       </div>
     </article>
   );

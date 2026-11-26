@@ -23,7 +23,7 @@ export function Header() {
     "Free shipping on every order",
     "30-day returns, no questions",
     "Zydane Line ships within 24 hours",
-    "Carbon-neutral delivery on every order",
+    "Secure checkout with card or PayPal",
   ];
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);

@@ -46,6 +46,8 @@ export default async function Shop({ searchParams }: { searchParams: Promise<Par
   else if (sort === "rating") list = [...list].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviews ?? 0) - (a.reviews ?? 0));
   else list = [...list].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
 
+  list = [...list].sort((a, b) => Number(a.comingSoon) - Number(b.comingSoon));
+
   const title = q
     ? `Results for “${q}”`
     : collection
