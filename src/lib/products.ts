@@ -494,22 +494,6 @@ export const products: Product[] = [
     art: "flask",
     tone: ["#E0E4DE", "#9DAA98"],
   },
-  // TEMPORARY: a £1 item for testing real payments. Delete this entry after testing.
-  {
-    slug: "payment-test-7k2q",
-    hidden: true,
-    name: "Zydane payment test",
-    subtitle: "Internal test item. Nothing will be shipped.",
-    price: 1.3,
-    prices: { GBP: { price: 1 } },
-    markets: ["GB"],
-    category: "home",
-    source: "house",
-    description: "An internal item used to test card payments. It is not for sale and nothing will be shipped.",
-    details: ["Internal payment test", "Nothing will be shipped"],
-    art: "jar",
-    tone: ["#E8E2D8", "#8A7A62"],
-  },
 ];
 
 export const getProduct = (slug: string) => products.find((p) => p.slug === slug);
